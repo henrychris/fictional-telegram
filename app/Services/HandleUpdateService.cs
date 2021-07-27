@@ -32,21 +32,21 @@ namespace app.Services
 
             var action = (callbackQuery.Data) switch
             {
-                // "Menu" => Keyboards.SendMenu(callbackQuery.Message),
-                // "Login" => Keyboards.SendLoginKeyboard(callbackQuery.Message),
-                // "Reports" => Keyboards.SendReportKeyboard(callbackQuery.Message),
+                "Menu" => _keyboards.SendMenu(callbackQuery.Message),
+                "Login" => _keyboards.SendLoginKeyboard(callbackQuery.Message),
+                "Reports" => _keyboards.SendReportKeyboard(callbackQuery.Message),
                 // // Branch Level
-                // "BranchReports" => Keyboards.SendBranchReportsKeyboard(callbackQuery.Message),
+                // "BranchReports" => _keyboards.SendBranchReportsKeyboard(callbackQuery.Message),
 
                 // // Company Level
-                // "CompanyReports" => Keyboards.SendCompanyReportsKeyboard(callbackQuery.Message),
+                // "CompanyReports" => _keyboards.SendCompanyReportsKeyboard(callbackQuery.Message),
 
                 // // answering report day range request
 
 
                 // // responding to an unknown command
                 _ => UnknownCommand(callbackQuery.Message),
-                // _ => SendMenu(callbackQuery.Message)
+                // _ => _keyboards.SendMenu(callbackQuery.Message)
             };
         }
 
@@ -58,8 +58,8 @@ namespace app.Services
             var action = (message.Text.Split(' ').First()) switch
             {
                 "/start" => _keyboards.Start(message),
-                // "/menu" => Keyboards.SendMenu(message),
-                // "/help" => Keyboards.SendHelp(message),
+                "/menu" => _keyboards.SendMenu(message),
+                "/help" => _keyboards.SendHelp(message),
                 _ => UnknownCommand(message)
             };
 
