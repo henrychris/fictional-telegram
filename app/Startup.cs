@@ -16,6 +16,7 @@ using app.Data;
 using Microsoft.EntityFrameworkCore;
 using app.Interfaces;
 using app.Data.Repository;
+using app.Components.Reports;
 
 namespace app
 {
@@ -27,6 +28,7 @@ namespace app
         {
             services.AddTransient<Keyboards>();
             services.AddScoped<ErrorHandler>();
+            services.AddTransient<BranchReports>();
         }
 
         public static void ConfigureAutoMapper(this IServiceCollection services)
