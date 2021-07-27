@@ -69,24 +69,6 @@ You can control me with these commands:
             return await _botClient.SendTextMessageAsync(message.Chat.Id, response);
         }
 
-        public async Task<Message> SendReportKeyboard(Message message)
-        {
-            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-            InlineKeyboardMarkup reportKeyboard = new(new[]
-            {
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData("Branch", "BranchReports"),
-                    InlineKeyboardButton.WithCallbackData("Company", "CompanyReports"),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData("Back", "Menu")
-                }
-            });
-            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Choose a Report", replyMarkup: reportKeyboard);
-        }
-
         public async Task<Message> SendLoginKeyboard(Message message)
         {
             // user check to prevent multiple logins
@@ -114,15 +96,104 @@ You can control me with these commands:
                 {
                     // https://cutt.ly/YmHIFok
                     // TODO add url to my login page. This should not be hard coded.
-                    InlineKeyboardButton.WithUrl("Login", _botConfig.LoginUrl)
+                    // InlineKeyboardButton.WithUrl("Login", _botConfig.LoginUrl)
+                    InlineKeyboardButton.WithUrl("Open Login Page", "https://cutt.ly/YmHIFok")
                 },
                 new []
                 {
                     InlineKeyboardButton.WithCallbackData("Back","Menu")
                 }
             });
-
             return await _botClient.SendTextMessageAsync(message.Chat.Id, "Login to Epump", replyMarkup: loginKeyboard);
+        }
+
+        public async Task<Message> SendReportKeyboard(Message message)
+        {
+            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+            InlineKeyboardMarkup reportKeyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Branch", "BranchReports"),
+                    InlineKeyboardButton.WithCallbackData("Company", "CompanyReports"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Back", "Menu")
+                }
+            });
+            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Choose a Report", replyMarkup: reportKeyboard);
+        }
+
+        public async Task<Message> SendCompanyReportsKeyboard(Message message)
+        {
+            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+            InlineKeyboardMarkup companyReportKeyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Branch Sales"),
+                    InlineKeyboardButton.WithCallbackData("Cashflow")
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Sales Summary"),
+                    InlineKeyboardButton.WithCallbackData("Tank Stock")
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Tanks Filled"),
+                    InlineKeyboardButton.WithCallbackData("Variance")
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Expense Categories"),
+                    InlineKeyboardButton.WithCallbackData("Zones Report")
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Outstanding Payments"),
+                    InlineKeyboardButton.WithCallbackData("Wallet Report")
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Retainership"),
+                    InlineKeyboardButton.WithCallbackData("Wallet Fund Request")
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Back", "Reports")
+                }
+            });
+            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Company-Level Reports", replyMarkup: companyReportKeyboard);
+        }
+
+        public async Task<Message> SendBranchReportsKeyboard(Message message)
+        {
+            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+            InlineKeyboardMarkup ReportKeyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Cashflow"),
+                    InlineKeyboardButton.WithCallbackData("Product Summary")
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Sales Transactions"),
+                    InlineKeyboardButton.WithCallbackData("Tanks Filled")
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Variance"),
+                    InlineKeyboardButton.WithCallbackData("Cashflow")
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Back", "Reports")
+                }
+            });
+            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Branch-Level Reports", replyMarkup: ReportKeyboard);
         }
     }
 }
