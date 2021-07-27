@@ -12,6 +12,8 @@ using NLog;
 using Telegram.Bot;
 using app.Components;
 using app.Services;
+using app.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace app
 {
@@ -32,6 +34,14 @@ namespace app
         public static void ConfigureLoggerService(this IServiceCollection services)
         {
             services.AddSingleton<ILoggerManager, LoggerManager>();
+        }
+
+        public static void ConfigureDbContext(this IServiceCollection services, string dbConnectionString)
+        {
+            services.AddDbContext<DataContext>(options =>
+            {
+                options.UseSqlite(dbConnectionString);
+            });
         }
     }
     public class Startup
@@ -91,6 +101,8 @@ namespace app
 
             services.ConfigureLoggerService();
             services.ConfigureAutoMapper();
+            services.ConfigureDbContext(BotConfig.DefaultConnection);
+            
             services.AddComponents();
             services.AddSwaggerGen(c =>
             {
