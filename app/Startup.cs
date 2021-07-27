@@ -14,6 +14,8 @@ using app.Components;
 using app.Services;
 using app.Data;
 using Microsoft.EntityFrameworkCore;
+using app.Interfaces;
+using app.Data.Repository;
 
 namespace app
 {
@@ -93,11 +95,12 @@ namespace app
             services.AddHostedService<ConfigureWebhook>();
 
             services.AddScoped<HandleUpdateService>();
-            services.AddTransient<UserActionsService>();
 
             services.AddHttpClient("tgwebhook")
                     .AddTypedClient<ITelegramBotClient>(httpClient
                         => new TelegramBotClient(BotConfig.BotToken, httpClient));
+
+            services.AddScoped<IUserRepository, UserRepository>();
 
             services.ConfigureLoggerService();
             services.ConfigureAutoMapper();
