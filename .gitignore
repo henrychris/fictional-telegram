@@ -455,3 +455,5 @@ $RECYCLE.BIN/
 app/appsettings.Development.json
 app/nlog.config
 /Logs
+app/Data/Migrations
+app/telegramData.db

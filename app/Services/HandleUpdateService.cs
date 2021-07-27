@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using app.Components;
+using app.Components.Reports;
 using app.Interfaces;
 using Contracts;
 using Telegram.Bot;
@@ -16,10 +17,13 @@ namespace app.Services
         private readonly ILoggerManager _logger;
         private readonly Keyboards _keyboards;
         private readonly ErrorHandler _errorHandler;
+        private readonly BranchReports _branchReports;
 
         public HandleUpdateService(ITelegramBotClient botClient, ILoggerManager logger,
-        Keyboards keyboards, ErrorHandler errorHandler)
+        Keyboards keyboards, ErrorHandler errorHandler, BranchReports branchReports
+        )
         {
+            _branchReports = branchReports;
             _errorHandler = errorHandler;
             _keyboards = keyboards;
             _botClient = botClient;
@@ -35,18 +39,19 @@ namespace app.Services
                 "Menu" => _keyboards.SendMenu(callbackQuery.Message),
                 "Login" => _keyboards.SendLoginKeyboard(callbackQuery.Message),
                 "Reports" => _keyboards.SendReportKeyboard(callbackQuery.Message),
-                // // Branch Level
-                // "BranchReports" => _keyboards.SendBranchReportsKeyboard(callbackQuery.Message),
 
-                // // Company Level
-                // "CompanyReports" => _keyboards.SendCompanyReportsKeyboard(callbackQuery.Message),
+                // Branch Level
+                "BranchReports" => _keyboards.SendBranchReportsKeyboard(callbackQuery.Message),
 
-                // // answering report day range request
+                // Company Level
+                "CompanyReports" => _keyboards.SendCompanyReportsKeyboard(callbackQuery.Message),
+
+                // answering specific report callback
+                "Cashflow" => _branchReports.SendCashflowReport(callbackQuery.Message),
 
 
-                // // responding to an unknown command
+                // responding to an unknown command
                 _ => UnknownCommand(callbackQuery.Message),
-                // _ => _keyboards.SendMenu(callbackQuery.Message)
             };
         }
 
@@ -94,7 +99,7 @@ namespace app.Services
 
         public async Task<Message> UnknownCommand(Message message)
         {
-            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+            // await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
             return await _botClient.SendTextMessageAsync(message.Chat.Id, "Unknown command. Use /menu to get started.");
         }
 
