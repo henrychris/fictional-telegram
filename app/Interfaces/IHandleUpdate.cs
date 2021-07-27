@@ -11,7 +11,5 @@ namespace app.Interfaces
         public Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery);
         public Task UnknownUpdateHandler(Update update);
         Task<Message> UnknownCommand(Message message);
-        public Task HandleErrorAsync(Exception exception);
-
     }
 }
