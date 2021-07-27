@@ -1,19 +1,16 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace app
 {
     public class Program
     {
+        protected static DateTime serverStart;
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
+            serverStart = DateTime.Now;
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -21,7 +18,7 @@ namespace app
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    // webBuilder.UseUrls("https://localhost:80");
+                    webBuilder.UseUrls("https://localhost:80");
                 });
     }
 }
