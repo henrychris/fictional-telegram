@@ -39,14 +39,21 @@ namespace app.Services
             // TODO : Simplify the comment above
 
             var webhookAddress = $"{_botConfig.WebhookUrl}/bot/{_botConfig.BotToken}";
+            var Bot = await botClient.GetMeAsync();
             _logger.LogInfo($"***\nSetting webhook:  {webhookAddress}\n***");
-            try {
-            await botClient.SetWebhookAsync(
-                url: webhookAddress,
-                allowedUpdates: Array.Empty<UpdateType>(),
-                cancellationToken: cancellationToken);
+
+            try
+            {
+                await botClient.SetWebhookAsync(
+                    url: webhookAddress,
+                    allowedUpdates: Array.Empty<UpdateType>(),
+                    cancellationToken: cancellationToken);
+
+                _logger.LogInfo($"Webhook Started at {DateTime.Now:HH:mm:ss}\n");
+                Console.WriteLine($"\n\t\tStarted listening for @{Bot.Username} at {DateTime.Now:HH:mm:ss}\n");
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 _logger.LogError(ex.Message);
                 System.Console.WriteLine(ex.Message);
             }
