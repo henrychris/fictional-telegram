@@ -36,7 +36,7 @@ namespace app.Services
             // If you'd like to make sure that the Webhook request comes from Telegram, we recommend
             // using a secret path in the URL, e.g. https://www.example.com/<token>.
             // Since nobody else knows your bot's token, you can be pretty sure it's us.
-            // TODO : Simplify the comment above
+            // ! Code here is from Telegram.Bot.Examples.Webhook
 
             var webhookAddress = $"{_botConfig.WebhookUrl}/bot/{_botConfig.BotToken}";
             var Bot = await botClient.GetMeAsync();
