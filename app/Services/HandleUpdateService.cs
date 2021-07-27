@@ -1,22 +1,27 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using app.Components;
 using app.Interfaces;
 using Contracts;
 using Telegram.Bot;
-using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace app.Services
 {
-    public class HandleUpdateService : IHandleUpdate
+    public class HandleUpdateService : Program, IHandleUpdate
     {
         private readonly ITelegramBotClient _botClient;
         private readonly ILoggerManager _logger;
+        private readonly Keyboards _keyboards;
+        private readonly ErrorHandler _errorHandler;
 
-        public HandleUpdateService(ITelegramBotClient botClient, ILoggerManager logger)
+        public HandleUpdateService(ITelegramBotClient botClient, ILoggerManager logger,
+        Keyboards keyboards, ErrorHandler errorHandler)
         {
+            _errorHandler = errorHandler;
+            _keyboards = keyboards;
             _botClient = botClient;
             _logger = logger;
         }
@@ -48,10 +53,11 @@ namespace app.Services
         public async Task BotOnMessageReceived(Message message)
         {
             // TODO add check for messages sent while Bot was offline
+            if ((message.Date.ToLocalTime() < serverStart)) return;
 
             var action = (message.Text.Split(' ').First()) switch
             {
-                // "/start" => Keyboards.Start(message),
+                "/start" => _keyboards.Start(message),
                 // "/menu" => Keyboards.SendMenu(message),
                 // "/help" => Keyboards.SendHelp(message),
                 _ => UnknownCommand(message)
@@ -64,12 +70,13 @@ namespace app.Services
             _logger.LogInfo(log);
         }
 
+
+        // The hub. Where all updates go to first
         public async Task EchoAsync(Update update)
         {
             var handler = update.Type switch
             {
                 // logic to handle all possible update types
-                
                 UpdateType.Message => BotOnMessageReceived(update.Message),
                 UpdateType.CallbackQuery => BotOnCallbackQueryReceived(update.CallbackQuery),
                 _ => UnknownUpdateHandler(update)
@@ -81,20 +88,8 @@ namespace app.Services
             }
             catch (Exception exception)
             {
-                await HandleErrorAsync(exception);
+                await _errorHandler.HandleErrorAsync(exception);
             }
-        }
-
-        public Task HandleErrorAsync(Exception exception)
-        {
-            var ErrorMessage = exception switch
-            {
-                ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
-                _ => exception.ToString()
-            };
-
-            _logger.LogInfo(ErrorMessage);
-            return Task.CompletedTask;
         }
 
         public async Task<Message> UnknownCommand(Message message)
