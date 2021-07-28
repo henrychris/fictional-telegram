@@ -18,11 +18,17 @@ namespace app.Services
         private readonly Keyboards _keyboards;
         private readonly ErrorHandler _errorHandler;
         private readonly BranchReportsKeyboards _branchReportsKeyboards;
+        private readonly IUserRepository _userRepository;
+        private readonly BranchReports _branchReports;
 
         public HandleUpdateService(ITelegramBotClient botClient, ILoggerManager logger,
-        Keyboards keyboards, ErrorHandler errorHandler, BranchReportsKeyboards branchReportsKeyboards
+        Keyboards keyboards, ErrorHandler errorHandler, BranchReportsKeyboards branchReportsKeyboards,
+        IUserRepository userRepository, BranchReports branchReports
         )
+
         {
+            _branchReports = branchReports;
+            _userRepository = userRepository;
             _branchReportsKeyboards = branchReportsKeyboards;
             _errorHandler = errorHandler;
             _keyboards = keyboards;
@@ -47,11 +53,13 @@ namespace app.Services
                 "CompanyReports" => _keyboards.SendCompanyReportsKeyboard(callbackQuery.Message),
 
                 // answering specific report callback
-                "Cashflow" => _branchReportsKeyboards.SendCashflowReport(callbackQuery.Message),
+                "Cashflow" => _branchReportsKeyboards.SendBranchCashflowReportKeyboard(callbackQuery.Message),
 
 
                 // responding to an unknown command
-                _ => UnknownCommand(callbackQuery.Message),
+                // _ => UnknownCommand(callbackQuery.Message),
+
+                _ => CheckState(callbackQuery)
             };
         }
 
@@ -108,6 +116,27 @@ namespace app.Services
             Console.WriteLine($"Unknown update type: {update.Type}");
             _logger.LogInfo($"Received unknown update type: {update.Type}");
             return Task.CompletedTask;
+        }
+
+        public async Task<Message> CheckState(CallbackQuery query)
+        {
+            Message response = null;
+            var userState = await _userRepository.GetUserStateAsync(query.Message.Chat.Id);
+            if (userState == null)
+            {
+                return await UnknownCommand(query.Message);
+            }
+
+            switch (userState)
+            {
+                case "BranchCashflowReport":
+                    response = await _branchReports.SendBranchCashflowReportAsync(query, query.Message);
+                    break;
+                default:
+                    response = await UnknownCommand(query.Message);
+                    break;
+            }
+            return await _botClient.SendTextMessageAsync(query.Message.Chat.Id, "hi");
         }
     }
 }
