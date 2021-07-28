@@ -39,16 +39,19 @@ namespace app.Data.Repository
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
 
-        public async Task<string> GetUserState(long chatId)
+        public async Task<string> GetUserStateAsync(long chatId)
         {
-            return await  _context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId).ContinueWith(t => t.Result.State);
+            return await _context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId).ContinueWith(t => t.Result.State);
         }
 
-        public async Task SetUserState(long chatId, string state)
+        public async Task SetUserStateAsync(long chatId, string state)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
-            user.State = state;
-            await _context.SaveChangesAsync();
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.ChatId == chatId);
+            if (user != null)
+            {
+                user.State = state;
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<bool> SaveAllChangesAsync(AppUser user)
