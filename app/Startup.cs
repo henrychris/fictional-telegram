@@ -28,7 +28,7 @@ namespace app
         {
             services.AddTransient<Keyboards>();
             services.AddScoped<ErrorHandler>();
-            services.AddTransient<BranchReports>();
+            services.AddTransient<BranchReportsKeyboards>();
         }
 
         public static void ConfigureAutoMapper(this IServiceCollection services)

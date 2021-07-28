@@ -17,13 +17,13 @@ namespace app.Services
         private readonly ILoggerManager _logger;
         private readonly Keyboards _keyboards;
         private readonly ErrorHandler _errorHandler;
-        private readonly BranchReports _branchReports;
+        private readonly BranchReportsKeyboards _branchReportsKeyboards;
 
         public HandleUpdateService(ITelegramBotClient botClient, ILoggerManager logger,
-        Keyboards keyboards, ErrorHandler errorHandler, BranchReports branchReports
+        Keyboards keyboards, ErrorHandler errorHandler, BranchReportsKeyboards branchReportsKeyboards
         )
         {
-            _branchReports = branchReports;
+            _branchReportsKeyboards = branchReportsKeyboards;
             _errorHandler = errorHandler;
             _keyboards = keyboards;
             _botClient = botClient;
@@ -47,7 +47,7 @@ namespace app.Services
                 "CompanyReports" => _keyboards.SendCompanyReportsKeyboard(callbackQuery.Message),
 
                 // answering specific report callback
-                "Cashflow" => _branchReports.SendCashflowReport(callbackQuery.Message),
+                "Cashflow" => _branchReportsKeyboards.SendCashflowReport(callbackQuery.Message),
 
 
                 // responding to an unknown command
