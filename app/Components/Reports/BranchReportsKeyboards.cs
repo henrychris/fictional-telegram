@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using app.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -8,12 +9,17 @@ namespace app.Components.Reports
     public class BranchReportsKeyboards
     {
         private readonly ITelegramBotClient _botClient;
-        public BranchReportsKeyboards(ITelegramBotClient botClient)
+        private readonly IUserRepository _userRepository;
+        public BranchReportsKeyboards(ITelegramBotClient botClient, IUserRepository userRepository)
         {
+            _userRepository = userRepository;
             _botClient = botClient;
         }
-        public async Task<Message> SendCashflowReport(Message message)
+        public async Task SendBranchCashflowReportKeyboard(Message message)
         {
+            // delete last message
+            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+
             var keyboard = new InlineKeyboardMarkup(new[]
             {
             new[]
@@ -32,8 +38,9 @@ namespace app.Components.Reports
             }
             });
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the cashflow report", replyMarkup: new ForceReplyMarkup());
-            return  await _botClient.SendTextMessageAsync(message.Chat.Id, message.ReplyToMessage.Text);
+            await _userRepository.SetUserStateAsync(message.From.Id, "BranchCashflowReport");
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the cashflow report", replyMarkup: keyboard);
+            // return await _botClient.SendTextMessageAsync(message.Chat.Id, message.ReplyToMessage.Text);
         }
 
         // public void SetReportRangeKeyboard(Message message)
