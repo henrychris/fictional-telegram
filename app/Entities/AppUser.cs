@@ -13,5 +13,7 @@ namespace app.Entities
         public DateTime AuthDate { get; set; }
         public string Hash { get; set; }
         public string EpumpAuthKey { get; set; }
+        public string Role { get; set; }
+        public string State { get; set; }
     }
 }
