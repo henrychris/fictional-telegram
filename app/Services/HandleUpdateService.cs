@@ -99,7 +99,7 @@ namespace app.Services
 
         public async Task<Message> UnknownCommand(Message message)
         {
-            // await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
             return await _botClient.SendTextMessageAsync(message.Chat.Id, "Unknown command. Use /menu to get started.");
         }
 
