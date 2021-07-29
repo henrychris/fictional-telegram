@@ -2,14 +2,18 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using app.Entities;
 using app.Interfaces;
+using app.Components;
+using System;
 
 namespace app.Data.Repository
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : DbContext, IUserRepository
     {
         private readonly DataContext _context;
-        public UserRepository(DataContext context)
+        private readonly ErrorHandler _errorHandler;
+        public UserRepository(DataContext context, ErrorHandler errorHandler)
         {
+            _errorHandler = errorHandler;
             _context = context;
         }
 
@@ -41,16 +45,36 @@ namespace app.Data.Repository
 
         public async Task<string> GetUserStateAsync(long chatId)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId).ContinueWith(t => t.Result.State);
+            var user = await _context.Users.FindAsync(chatId);
+            return user.State;
         }
 
         public async Task SetUserStateAsync(long chatId, string state)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.ChatId == chatId);
-            if (user != null)
+            try
             {
-                user.State = state;
-                await _context.SaveChangesAsync();
+                /*
+                    This  function previously failed because the context was disposed prematurely
+                    To prevent this, i am using a new instance of the context.
+                */
+                using (var context = new DataContext())
+
+                {
+                    var user = context.Users.Find(chatId);
+                    if (user != null)
+                    {
+                        user.State = state;
+                        await context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        await _errorHandler.HandleErrorAsync(new Exception("User not found"));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleErrorAsync(ex);
             }
         }
 
