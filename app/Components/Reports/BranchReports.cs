@@ -50,7 +50,7 @@ namespace app.Components.Reports
             return await _botClient.SendTextMessageAsync(message.Chat.Id, $"Branch Variance: {query.Data}");
         }
 
-        public async Task<Message> SendBranchTankReporAsync(CallbackQuery query, Message message)
+        public async Task<Message> SendBranchTankReportAsync(CallbackQuery query, Message message)
         {
             return await _botClient.SendTextMessageAsync(message.Chat.Id, $"Branch Tank Report: {query.Data}");
         }

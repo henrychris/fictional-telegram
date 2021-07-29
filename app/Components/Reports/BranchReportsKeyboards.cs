@@ -49,7 +49,7 @@ namespace app.Components.Reports
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Product Summary report", replyMarkup: keyboard);
-            await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchProductSummmaryReport");
+            await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchProductSummaryReport");
         }
 
         public async Task SendBranchSalesTransactionsReportKeyboard(Message message)
