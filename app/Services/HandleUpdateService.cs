@@ -20,14 +20,19 @@ namespace app.Services
         private readonly BranchReportsKeyboards _branchReportsKeyboards;
         private readonly IUserRepository _userRepository;
         private readonly BranchReports _branchReports;
+        private readonly CompanyReports _companyReports;
+        private readonly CompanyReportsKeyboards _companyReportsKeyboards;
 
         public HandleUpdateService(ITelegramBotClient botClient, ILoggerManager logger,
         Keyboards keyboards, ErrorHandler errorHandler, BranchReportsKeyboards branchReportsKeyboards,
-        IUserRepository userRepository, BranchReports branchReports
+        IUserRepository userRepository, BranchReports branchReports, CompanyReports companyReports,
+        CompanyReportsKeyboards companyReportsKeyboards
         )
 
         {
             _branchReports = branchReports;
+            _companyReports = companyReports;
+            _companyReportsKeyboards = companyReportsKeyboards;
             _userRepository = userRepository;
             _branchReportsKeyboards = branchReportsKeyboards;
             _errorHandler = errorHandler;
@@ -53,6 +58,7 @@ namespace app.Services
                 "CompanyReports" => _keyboards.SendCompanyReportsKeyboard(callbackQuery.Message),
 
                 // answering specific report callback
+                // Branch Reports
                 "Cashflow" => _branchReportsKeyboards.SendBranchCashflowReportKeyboard(callbackQuery.Message),
                 "Product Summary" => _branchReportsKeyboards.SendProductSummaryReportKeyboard(callbackQuery.Message),
                 "Sales Transactions" => _branchReportsKeyboards.SendBranchSalesTransactionsReportKeyboard(callbackQuery.Message),
@@ -60,6 +66,19 @@ namespace app.Services
                 "Variance" => _branchReportsKeyboards.SendBranchVarianceReportKeyboard(callbackQuery.Message),
                 "Tank Report" => _branchReportsKeyboards.SendBranchTankReportKeyboard(callbackQuery.Message),
 
+                // Company Reports
+                "Branch Sales" => _companyReportsKeyboards.SendCompanyBranchSalesReportKeyboard(callbackQuery.Message),
+                "Company Cashflow" => _companyReportsKeyboards.SendCompanyCashflowReportKeyboard(callbackQuery.Message),
+                "Sales Summary" => _companyReportsKeyboards.SendCompanySalesSummaryReportKeyboard(callbackQuery.Message),
+                "Tank Stock" => _companyReportsKeyboards.SendCompanyTankStockReportKeyboard(callbackQuery.Message),
+                "Company Tanks Filled" => _companyReportsKeyboards.SendCompanyTanksFilledReportKeyboard(callbackQuery.Message),
+                "Company Variance" => _companyReportsKeyboards.SendCompanyVarianceReportKeyboard(callbackQuery.Message),
+                "Expense Categories" => _companyReportsKeyboards.SendCompanyExpenseCategoriesReportKeyboard(callbackQuery.Message),
+                "Zones Report" => _companyReportsKeyboards.SendCompanyZonesReportKeyboard(callbackQuery.Message),
+                "Outstanding Payments" => _companyReportsKeyboards.SendCompanyOutstandingPaymentsReportKeyboard(callbackQuery.Message),
+                "Wallet Report" => _companyReportsKeyboards.SendCompanyWalletReportKeyboard(callbackQuery.Message),
+                "Retainership" => _companyReportsKeyboards.SendCompanyRetainershipReportKeyboard(callbackQuery.Message),
+                "Wallet Fund Request" => _companyReportsKeyboards.SendCompanyWalletFundRequestReportKeyboard(callbackQuery.Message),
 
                 // responding to an unknown command
                 // _ => UnknownCommand(callbackQuery.Message),
@@ -126,7 +145,7 @@ namespace app.Services
         public async Task<Message> CheckState(CallbackQuery query)
         {
             Message response = null;
-            var userState = await _userRepository.GetUserStateAsync(query.Message.Chat.Id);
+            var userState = _userRepository.GetUserStateAsync(query.Message.Chat.Id);
             if (userState == null)
             {
                 return await UnknownCommand(query.Message);
@@ -148,6 +167,43 @@ namespace app.Services
                     break;
                 case "BranchVarianceReport":
                     response = await _branchReports.SendBranchVarianceReportAsync(query, query.Message);
+                    break;
+                case "BranchTankReport":
+                    response = await _branchReports.SendBranchTankReportAsync(query, query.Message);
+                    break;
+                // Company Level
+                case "CompanyBranchSalesReport":
+                    response = await _companyReports.SendCompanyBranchSalesReportAsync(query, query.Message);
+                    break;
+                case "CompanyCashflowReport":
+                    response = await _companyReports.SendCompanyCashflowReportAsync(query, query.Message);
+                    break;
+                case "CompanySalesSummaryReport":
+                    response = await _companyReports.SendCompanySalesSummaryReportAsync(query, query.Message);
+                    break;
+                case "CompanyTankStockReport":
+                    response = await _companyReports.SendCompanyTankStockReportAsync(query, query.Message);
+                    break;
+                case "CompanyVarianceReport":
+                    response = await _companyReports.SendCompanyVarianceReportAsync(query, query.Message);
+                    break;
+                case "CompanyExpenseCategoriesReport":
+                    response = await _companyReports.SendCompanyExpenseCategoriesReportAsync(query, query.Message);
+                    break;
+                case "CompanyZonesReport":
+                    response = await _companyReports.SendCompanyZonesReportAsync(query, query.Message);
+                    break;
+                case "CompanyOutstandingPaymentsReport":
+                    response = await _companyReports.SendCompanyOutstandingPaymentsReportAsync(query, query.Message);
+                    break;
+                case "CompanyWalletReport":
+                    response = await _companyReports.SendCompanyWalletReportAsync(query, query.Message);
+                    break;
+                case "CompanyRetainershipReport":
+                    response = await _companyReports.SendCompanyRetainershipReportAsync(query, query.Message);
+                    break;
+                case "CompanyWalletFundRequestReport":
+                    response = await _companyReports.SendCompanyWalletFundRequestReportAsync(query, query.Message);
                     break;
                 default:
                     response = await UnknownCommand(query.Message);
