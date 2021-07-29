@@ -13,7 +13,6 @@ namespace app.Interfaces
         Task<string> GetUserStateAsync(long chatId);
         Task<AppUser> GetUserByUserNameAsync(string username);
         Task<bool> SaveAllChangesAsync(AppUser user);
-
         Task SetUserStateAsync(long chatId, string state);
         void Update(AppUser user);
     }
