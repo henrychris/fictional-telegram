@@ -28,8 +28,11 @@ namespace app
         {
             services.AddTransient<Keyboards>();
             services.AddScoped<ErrorHandler>();
+
             services.AddTransient<BranchReportsKeyboards>();
             services.AddTransient<BranchReports>();
+            services.AddTransient<CompanyReports>();
+            services.AddTransient<CompanyReportsKeyboards>();
         }
 
         public static void ConfigureAutoMapper(this IServiceCollection services)
