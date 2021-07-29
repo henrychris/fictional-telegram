@@ -54,6 +54,11 @@ namespace app.Services
 
                 // answering specific report callback
                 "Cashflow" => _branchReportsKeyboards.SendBranchCashflowReportKeyboard(callbackQuery.Message),
+                "Product Summary" => _branchReportsKeyboards.SendProductSummaryReportKeyboard(callbackQuery.Message),
+                "Sales Transactions" => _branchReportsKeyboards.SendBranchSalesTransactionsReportKeyboard(callbackQuery.Message),
+                "Tanks Filled" => _branchReportsKeyboards.SendBranchTanksFilledReportKeyboard(callbackQuery.Message),
+                "Variance" => _branchReportsKeyboards.SendBranchVarianceReportKeyboard(callbackQuery.Message),
+                "Tank Report" => _branchReportsKeyboards.SendBranchTankReportKeyboard(callbackQuery.Message),
 
 
                 // responding to an unknown command
@@ -132,11 +137,23 @@ namespace app.Services
                 case "BranchCashflowReport":
                     response = await _branchReports.SendBranchCashflowReportAsync(query, query.Message);
                     break;
+                case "BranchProductSummaryReport":
+                    response = await _branchReports.SendProductSummaryReportAsync(query, query.Message);
+                    break;
+                case "BranchSalesTransactionsReport":
+                    response = await _branchReports.SendBranchSalesTransactionsReportAsync(query, query.Message);
+                    break;
+                case "BranchTanksFilledReport":
+                    response = await _branchReports.SendBranchTanksFilledReportAsync(query, query.Message);
+                    break;
+                case "BranchVarianceReport":
+                    response = await _branchReports.SendBranchVarianceReportAsync(query, query.Message);
+                    break;
                 default:
                     response = await UnknownCommand(query.Message);
                     break;
             }
-            return await _botClient.SendTextMessageAsync(query.Message.Chat.Id, "hi");
+            return response;
         }
     }
 }
