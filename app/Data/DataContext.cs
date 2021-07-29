@@ -10,6 +10,15 @@ namespace app.Data
         {
         }
 
-        public DbSet<AppUser> Users { get; set; }
+        public DataContext()
+        {    
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlite("Data source=telegramData.db");
+        }
+
+        public DbSet<AppUser> Users { get; set; } 
     }
 }
