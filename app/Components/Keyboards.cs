@@ -133,7 +133,7 @@ You can control me with these commands:
                 new []
                 {
                     InlineKeyboardButton.WithCallbackData("Branch Sales"),
-                    InlineKeyboardButton.WithCallbackData("Cashflow")
+                    InlineKeyboardButton.WithCallbackData("Company Cashflow")
                 },
                 new []
                 {
@@ -142,8 +142,8 @@ You can control me with these commands:
                 },
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData("Tanks Filled"),
-                    InlineKeyboardButton.WithCallbackData("Variance")
+                    InlineKeyboardButton.WithCallbackData("Company Tanks Filled"),
+                    InlineKeyboardButton.WithCallbackData("Company Variance")
                 },
                 new []
                 {
