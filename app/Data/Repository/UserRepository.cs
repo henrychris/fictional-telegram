@@ -4,6 +4,7 @@ using app.Entities;
 using app.Interfaces;
 using app.Components;
 using System;
+using System.Linq;
 
 namespace app.Data.Repository
 {
@@ -17,6 +18,9 @@ namespace app.Data.Repository
             _context = context;
         }
 
+        // ! where AsNoTracking is Enabled, values can only be read.
+        // ! Db should not be updated.
+
         public async Task AddUserAsync(AppUser user)
         {
             await _context.Users.AddAsync(user);
@@ -25,28 +29,33 @@ namespace app.Data.Repository
 
         public Task<bool> CheckUserExistsAsync(long chatId)
         {
+            _context.Users.AsNoTracking();
             return _context.Users.AnyAsync(u => u.ChatId == chatId);
         }
 
         public async Task<AppUser> GetUserByIdAndUserNameAsync(long chatId, string username)
         {
+            _context.Users.AsNoTracking();
             return await _context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId && u.Username == username);
         }
 
         public async Task<AppUser> GetUserByIdAsync(long chatId)
         {
-            return await _context.Users.FindAsync(chatId);
+            _context.Users.AsNoTracking();
+            return await _context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
         }
 
         public async Task<AppUser> GetUserByUserNameAsync(string username)
         {
+            _context.Users.AsNoTracking();
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
 
-        public async Task<string> GetUserStateAsync(long chatId)
+        public string GetUserStateAsync(long chatId)
         {
-            var user = await _context.Users.FindAsync(chatId);
-            return user.State;
+            _context.Users.AsNoTracking();
+            var user = _context.Users.FirstOrDefaultAsync(x =>x.ChatId == chatId).Result.State;
+            return user;
         }
 
         public async Task SetUserStateAsync(long chatId, string state)
@@ -56,13 +65,14 @@ namespace app.Data.Repository
                 /*
                     This  function previously failed because the context was disposed prematurely
                     To prevent this, i am using a new instance of the context.
+                    It will be disposed automatically.
                 */
                 using (var context = new DataContext())
-
                 {
-                    var user = context.Users.Find(chatId);
+                    var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
                     if (user != null)
                     {
+                        // user.State.Remove();
                         user.State = state;
                         await context.SaveChangesAsync();
                     }
