@@ -38,9 +38,9 @@ namespace app.Components.Reports
             }
             });
 
-            await _userRepository.SetUserStateAsync(message.From.Id, "BranchCashflowReport");
             await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the cashflow report", replyMarkup: keyboard);
-            // return await _botClient.SendTextMessageAsync(message.Chat.Id, message.ReplyToMessage.Text);
+            await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchCashflowReport");
+    
         }
 
         // public void SetReportRangeKeyboard(Message message)
