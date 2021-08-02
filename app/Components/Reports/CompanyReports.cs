@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -7,6 +8,7 @@ namespace app.Components.Reports
     public class CompanyReports
     {
         private readonly ITelegramBotClient _botClient;
+        string dateTimeFormat = "MMMM dd, yyyy";
         public CompanyReports(ITelegramBotClient botClient)
         {
             _botClient = botClient;
@@ -101,6 +103,24 @@ namespace app.Components.Reports
             // delete the message
             await _botClient.DeleteMessageAsync(query.Message.Chat.Id, message.MessageId);
             return await _botClient.SendTextMessageAsync(message.Chat.Id, $"Company Wallet Fund Request: {query.Data}");
+        }
+
+        public string ConvertTextToDateTime(string dateTimeText)
+        {
+            // Epump's Date Format is "Jan 1st, 2021"
+            switch (dateTimeText)
+            {
+                case "Today":
+                    return DateTime.Today.ToString(dateTimeFormat);
+                case "Yesterday":
+                    return DateTime.Today.AddDays(-1).ToString(dateTimeFormat);
+                case "Week":
+                    return DateTime.Today.AddDays(-7).ToString(dateTimeFormat);
+                case "Month":
+                    return DateTime.Today.AddMonths(-1).ToString(dateTimeFormat);
+                default:
+                    return DateTime.Today.AddDays(-3).ToString(dateTimeFormat);
+            }
         }
     }
 }

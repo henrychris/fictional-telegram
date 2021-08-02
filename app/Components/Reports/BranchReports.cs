@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -7,6 +8,7 @@ namespace app.Components.Reports
     public class BranchReports
     {
         private readonly ITelegramBotClient _botClient;
+        string dateTimeFormat = "MMMM dd, yyyy";
         public BranchReports(ITelegramBotClient botClient)
         {
             _botClient = botClient;
@@ -53,6 +55,24 @@ namespace app.Components.Reports
         public async Task<Message> SendBranchTankReportAsync(CallbackQuery query, Message message)
         {
             return await _botClient.SendTextMessageAsync(message.Chat.Id, $"Branch Tank Report: {query.Data}");
+        }
+
+        public string ConvertTextToDateTime(string dateTimeText)
+        {
+            // Epump's Date Format is "Jan 1st, 2021"
+            switch (dateTimeText)
+            {
+                case "Today":
+                    return DateTime.Today.ToString(dateTimeFormat);
+                case "Yesterday":
+                    return DateTime.Today.AddDays(-1).ToString(dateTimeFormat);
+                case "Week":
+                    return DateTime.Today.AddDays(-7).ToString(dateTimeFormat);
+                case "Month":
+                    return DateTime.Today.AddMonths(-1).ToString(dateTimeFormat);
+                default:
+                    return DateTime.Today.AddDays(-3).ToString(dateTimeFormat);
+            }
         }
     }
 }
