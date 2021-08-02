@@ -94,10 +94,9 @@ You can control me with these commands:
             {
                 new []
                 {
-                    // https://cutt.ly/YmHIFok
-                    // TODO add url to my login page. This should not be hard coded.
-                    // InlineKeyboardButton.WithUrl("Login", _botConfig.LoginUrl)
-                    InlineKeyboardButton.WithUrl("Open Login Page", "https://cutt.ly/YmHIFok")
+                    // url to login page.
+                    InlineKeyboardButton.WithUrl("Login", _botConfig.LoginUrl)
+                    // InlineKeyboardButton.WithUrl("Open Login Page", "https://cutt.ly/YmHIFok")
                 },
                 new []
                 {
