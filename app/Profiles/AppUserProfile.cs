@@ -14,8 +14,7 @@ namespace app.Profiles
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.first_name))
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.username))
                 .ForMember(dest => dest.AuthDate, opt => opt.MapFrom(src => UnixTimeStampToDateTime(src.auth_date)))
-                .ForMember(dest => dest.Hash, opt => opt.MapFrom(src => src.hash))
-                .ForMember(dest => dest.EpumpAuthKey, opt => opt.MapFrom(src => src.auth_key));
+                .ForMember(dest => dest.Hash, opt => opt.MapFrom(src => src.hash));
         }
 
         public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
