@@ -106,6 +106,12 @@ namespace app
                     .AddTypedClient<ITelegramBotClient>(httpClient
                         => new TelegramBotClient(BotConfig.BotToken, httpClient));
 
+            services.AddHttpClient("EpumpReportApi", client =>
+            {
+                client.BaseAddress = new Uri(BotConfig.EpumpUri);
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+
             services.AddScoped<IUserRepository, UserRepository>();
 
             services.ConfigureLoggerService();
