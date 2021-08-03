@@ -108,9 +108,12 @@ You can control me with these commands:
 
         public async Task<Message> SendReportKeyboard(Message message)
         {
-            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-            InlineKeyboardMarkup reportKeyboard = new(new[]
+            // add check to prevent users who aren't in the Db from accessing this.
+            if (await _userRepository.CheckUserExistsAsync(message.Chat.Id))
             {
+                await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+                InlineKeyboardMarkup reportKeyboard = new(new[]
+                {
                 new []
                 {
                     InlineKeyboardButton.WithCallbackData("Branch", "BranchReports"),
@@ -121,7 +124,13 @@ You can control me with these commands:
                     InlineKeyboardButton.WithCallbackData("Back", "Menu")
                 }
             });
-            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Choose a Report", replyMarkup: reportKeyboard);
+                return await _botClient.SendTextMessageAsync(message.Chat.Id, "Choose a Report", replyMarkup: reportKeyboard);
+            }
+
+            else 
+            {
+                return await _botClient.SendTextMessageAsync(message.Chat.Id, "You are not logged in!\nUse /menu to get started");
+            }
         }
 
         public async Task<Message> SendCompanyReportsKeyboard(Message message)
