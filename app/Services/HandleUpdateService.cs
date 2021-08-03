@@ -90,6 +90,10 @@ namespace app.Services
         public async Task BotOnMessageReceived(Message message)
         {
             // TODO add check for messages sent while Bot was offline
+            // maybe convert from unix time first?
+            // ! The ngrok server does not receive data until the webhook is set.
+            // ! So, the bot will not receive any messages until the webhook is set.
+            // ? How do I ignore old messages?
             if ((message.Date.ToLocalTime() < serverStart)) return;
 
             var action = (message.Text.Split(' ').First()) switch
