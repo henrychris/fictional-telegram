@@ -20,5 +20,6 @@ namespace app.Data
         }
 
         public DbSet<AppUser> Users { get; set; } 
+        public DbSet<EpumpData> EpumpData { get; set; }  
     }
 }
