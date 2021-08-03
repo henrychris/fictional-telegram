@@ -12,7 +12,5 @@ namespace app.Data.DTOs
         public long auth_date { get; set; }
 
         public string hash { get; set; }
-
-        public string auth_key { get; set; }
     }
 }
