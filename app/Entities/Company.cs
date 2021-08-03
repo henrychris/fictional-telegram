@@ -9,8 +9,6 @@ namespace app.Entities
         public string Id { get; set; }
         public string EpumpDataId { get; set; }
 
-        public virtual ICollection<Branch> Branches { get; set; }
-
         [ForeignKey("EpumpDataId")]
         public virtual EpumpData EpumpData { get; set; }
     }
