@@ -94,6 +94,7 @@ namespace app.Services
             // ! The ngrok server does not receive data until the webhook is set.
             // ! So, the bot will not receive any messages until the webhook is set.
             // ? How do I ignore old messages?
+            // ? subtract  five seconds from each message? or ten
             if ((message.Date.ToLocalTime() < serverStart)) return;
 
             var action = (message.Text.Split(' ').First()) switch
@@ -101,6 +102,7 @@ namespace app.Services
                 "/start" => _keyboards.Start(message),
                 "/menu" => _keyboards.SendMenu(message),
                 "/help" => _keyboards.SendHelp(message),
+                "/reports" => _keyboards.SendReportKeyboard(message),
                 _ => UnknownCommand(message)
             };
 
