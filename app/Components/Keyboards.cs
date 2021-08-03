@@ -64,7 +64,8 @@ namespace app.Components
 
 You can control me with these commands:
 /start - start/restart me
-/menu - display the menu";
+/menu - display the menu
+/reports - retrieve a report";
 
             return await _botClient.SendTextMessageAsync(message.Chat.Id, response);
         }
@@ -72,7 +73,6 @@ You can control me with these commands:
         public async Task<Message> SendLoginKeyboard(Message message)
         {
             // user check to prevent multiple logins
-            var chatDetails = message.Chat;
             var userCheck = await _userRepository.CheckUserExistsAsync(message.Chat.Id);
             try
             {
