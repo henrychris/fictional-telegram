@@ -57,7 +57,7 @@ namespace app
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            LogManager.LoadConfiguration("./nlog.config");
+            LogManager.LoadConfiguration("app/nlog.config");
             BotConfig = Configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
         }
 
