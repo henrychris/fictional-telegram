@@ -70,13 +70,14 @@ namespace app.Components.Reports
             await _userRepository.SetUserStateAsync(message.Chat.Id, "CompanyTankStockReport");
         }
 
-        public async Task SendCompanyTanksFilledReportKeyboard(Message message)
+        public async Task<Message> SendCompanyTanksFilledReportKeyboard(Message message)
         {
             // delete last message
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Tanks Filled report", replyMarkup: keyboard);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "CompanyTanksFilledReport");
+
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Input time in this format: 'Jan 01, 2000'", replyMarkup: new ForceReplyMarkup());
+            return null;
         }
 
         public async Task SendCompanyVarianceReportKeyboard(Message message)
@@ -102,7 +103,7 @@ namespace app.Components.Reports
             // delete last message
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Zones report", replyMarkup: keyboard);
+            // await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Zones report", replyMarkup: keyboard);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "CompanyZonesReport");
         }
 
@@ -128,7 +129,7 @@ namespace app.Components.Reports
         {
             // delete last message
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-            
+
             await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Retainership report", replyMarkup: keyboard);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "CompanyRetainershipReport");
         }
@@ -138,7 +139,19 @@ namespace app.Components.Reports
             // delete last message
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the report", replyMarkup: keyboard);
+            keyboard = new InlineKeyboardMarkup(new[]
+            {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Approved", "approved"),
+                InlineKeyboardButton.WithCallbackData("Pending", "pending")
+            },
+            new []
+            {
+                InlineKeyboardButton.WithCallbackData("Show All", "show all")
+            }});
+
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Status?", replyMarkup: keyboard);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "CompanyWalletFundRequestReport");
         }
     }
