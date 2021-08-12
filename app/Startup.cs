@@ -60,8 +60,9 @@ namespace app
             LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
             BotConfig = Configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
         }
-        public IConfiguration Configuration { get; }
-        protected BotConfiguration BotConfig { get; }
+
+        private IConfiguration Configuration { get; }
+        private BotConfiguration BotConfig { get; }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

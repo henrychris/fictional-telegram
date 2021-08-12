@@ -6,11 +6,11 @@ namespace app
 {
     public class Program
     {
-        protected static DateTime serverStart;
+        protected static DateTime ServerStart;
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
-            serverStart = DateTime.Now;
+            ServerStart = DateTime.Now;
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

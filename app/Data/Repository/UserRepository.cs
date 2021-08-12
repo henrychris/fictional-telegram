@@ -4,7 +4,6 @@ using app.Entities;
 using app.Interfaces;
 using app.Components;
 using System;
-using System.Linq;
 
 namespace app.Data.Repository
 {
@@ -117,32 +116,30 @@ namespace app.Data.Repository
 
         public async Task SetCurrentBranchIdToNull(long chatId)
         {
-            using (var context = new DataContext())
+            await using var context = new DataContext();
+            var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+            if (user != null)
             {
-                var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
-                if (user != null)
-                {
-                    user.CurrentBranch = null;
-                    await context.SaveChangesAsync();
-                }
+                user.CurrentBranch = null;
+                await context.SaveChangesAsync();
             }
         }
 
         public async Task<string> GetCurrentBranchIdAsync(long chatId)
         {
             AppUser user = null;
-            using (var context = new DataContext())
+            await using var context = new DataContext();
+            try
             {
-                try
-                {
-                    user = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
-                }
-                catch (Exception e)
-                {
-                    System.Console.WriteLine(e.Message);
-                }
-                return user.CurrentBranch;
+                user = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
             }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e.Message);
+            }
+
+            // Whenever there is a null value, it shall return null
+            return user?.CurrentBranch;
         }
     }
 }

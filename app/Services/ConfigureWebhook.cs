@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using app.Interfaces;
 using Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,7 +38,8 @@ namespace app.Services
             // ! Code here is from Telegram.Bot.Examples.Webhook
 
             var webhookAddress = $"{_botConfig.WebhookUrl}/bot/{_botConfig.BotToken}";
-            var Bot = await botClient.GetMeAsync();
+            // Cancellation token isn't necessary
+            var bot = await botClient.GetMeAsync(cancellationToken);
             _logger.LogInfo($"***\nSetting webhook:  {webhookAddress}\n***");
 
             try
@@ -50,12 +50,12 @@ namespace app.Services
                     cancellationToken: cancellationToken);
 
                 _logger.LogInfo($"Webhook Started at {DateTime.Now:HH:mm:ss}\n");
-                Console.WriteLine($"\n\t\tStarted listening for @{Bot.Username} at {DateTime.Now:HH:mm:ss}\n");
+                Console.WriteLine($"\n\t\tStarted listening for @{bot.Username} at {DateTime.Now:HH:mm:ss}\n");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                System.Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.Message);
             }
         }
 

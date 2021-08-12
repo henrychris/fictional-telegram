@@ -5,7 +5,7 @@ namespace app.Interfaces
 {
     public interface IEpumpDataRepository
     {
-        Task<EpumpData> GetUserDetailsAsync(long ChatId);
-        Task<string> GetUserCompanyId(long ChatId);
+        Task<EpumpData> GetUserDetailsAsync(long chatId);
+        Task<string> GetUserCompanyId(long chatId);
     }
 }

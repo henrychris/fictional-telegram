@@ -179,7 +179,7 @@ You can control me with these commands:
         public async Task<Message> SendBranchReportsKeyboard(Message message)
         {
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-            InlineKeyboardMarkup ReportKeyboard = new(new[]
+            InlineKeyboardMarkup reportKeyboard = new(new[]
             {
                 new []
                 {
@@ -201,7 +201,7 @@ You can control me with these commands:
                     InlineKeyboardButton.WithCallbackData("Back", "Reports")
                 }
             });
-            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Branch-Level Reports", replyMarkup: ReportKeyboard);
+            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Branch-Level Reports", replyMarkup: reportKeyboard);
         }
     }
 }

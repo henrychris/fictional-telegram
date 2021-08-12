@@ -99,7 +99,7 @@ namespace app.Services
             // ! So, the bot will not receive any messages until the webhook is set.
             // ? How do I ignore old messages?
             // ? subtract  five seconds from each message? or ten
-            if ((message.Date.ToLocalTime() < serverStart)) return;
+            if ((message.Date.ToLocalTime() < ServerStart)) return;
 
             var action = (message.Text.Split(' ').First()) switch
             {
@@ -114,7 +114,7 @@ namespace app.Services
             var sentMessage = await action;
 
             var log = $"The message was sent to {sentMessage.Chat.Id} with id: {sentMessage.MessageId}";
-            System.Console.WriteLine(log);
+            Console.WriteLine(log);
             _logger.LogInfo(log);
         }
 
@@ -153,7 +153,7 @@ namespace app.Services
             return Task.CompletedTask;
         }
 
-        public async Task<Message> CheckState(Message message)
+        private async Task<Message> CheckState(Message message)
         {
             Message response = null;
             var userState = await _userRepository.GetUserStateAsync(message.Chat.Id);
@@ -162,25 +162,19 @@ namespace app.Services
                 return await UnknownCommand(message);
             }
 
-            switch (userState)
+            response = userState switch
             {
                 // The report will be sent from here.
-                case "BranchTanksFilledReport":
-                    response = await _branchReports.SendBranchTanksFilledReportAsync(message);
-                    break;
-                case "CompanyTanksFilledReport":
-                    response = await _companyReports.SendCompanyTanksFilledReportAsync(message);
-                    break;
-                default:
-                    response = await UnknownCommand(message);
-                    break;
-            }
+                "BranchTanksFilledReport" => await _branchReports.SendBranchTanksFilledReportAsync(message),
+                "CompanyTanksFilledReport" => await _companyReports.SendCompanyTanksFilledReportAsync(message),
+                _ => await UnknownCommand(message)
+            };
             return response;
         }
 
-        public async Task<Message> CheckState(CallbackQuery query)
+        private async Task<Message> CheckState(CallbackQuery query)
         {
-            Message response = null;
+            Message response;
             var userState = await _userRepository.GetUserStateAsync(query.Message.Chat.Id);
             if (userState == null)
             {

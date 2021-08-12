@@ -15,13 +15,13 @@ namespace app.Components
 
         public Task HandleErrorAsync(Exception exception)
         {
-            var ErrorMessage = exception switch
+            var errorMessage = exception switch
             {
                 ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
                 _ => exception.ToString()
             };
 
-            _logger.LogError(ErrorMessage);
+            _logger.LogError(errorMessage);
             return Task.CompletedTask;
         }
     }

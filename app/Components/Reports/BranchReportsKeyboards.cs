@@ -13,13 +13,12 @@ namespace app.Components.Reports
 {
     public class BranchReportsKeyboards
     {
-        public HttpClient client;
+        private readonly HttpClient _client;
         private readonly ITelegramBotClient _botClient;
         private readonly IEpumpDataRepository _epumpDataRepository;
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IUserRepository _userRepository;
 
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(new[]
+        private readonly InlineKeyboardMarkup _keyboard = new(new[]
             {
             new[]
             {
@@ -41,10 +40,9 @@ namespace app.Components.Reports
         , IEpumpDataRepository epumpDataRepository)
         {
             _epumpDataRepository = epumpDataRepository;
-            _httpClientFactory = httpClientFactory;
             _userRepository = userRepository;
             _botClient = botClient;
-            client = _httpClientFactory.CreateClient("EpumpApi");
+            _client = httpClientFactory.CreateClient("EpumpApi");
         }
         public async Task GetIdForBranchCashflowReport(Message message)
         {
@@ -60,7 +58,7 @@ namespace app.Components.Reports
             // delete last message
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the cashflow report", replyMarkup: keyboard);
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the cashflow report", replyMarkup: _keyboard);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchCashflowReport");
             return null;
         }
@@ -77,7 +75,7 @@ namespace app.Components.Reports
             await _userRepository.SetCurrentBranchIdAsync(message.Chat.Id, query.Data);
             // delete last message
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Sales Transactions report", replyMarkup: keyboard);
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Sales Transactions report", replyMarkup: _keyboard);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchSalesTransactionsReport");
             return null;
         }
@@ -94,7 +92,7 @@ namespace app.Components.Reports
             await _userRepository.SetCurrentBranchIdAsync(message.Chat.Id, query.Data);
             // delete last message
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Tank report", replyMarkup: keyboard);
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Tank report", replyMarkup: _keyboard);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchTankReport");
             return null;
         }
@@ -130,7 +128,7 @@ namespace app.Components.Reports
             // delete last message
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Variance report", replyMarkup: keyboard);
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Variance report", replyMarkup: _keyboard);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchVarianceReport");
             return null;
         }
@@ -148,31 +146,27 @@ namespace app.Components.Reports
             // delete last message
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Product Summary report", replyMarkup: keyboard);
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the Product Summary report", replyMarkup: _keyboard);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchProductSummaryReport");
             return null;
         }
 
-        private async Task ShowBranchDataAsKeyboardAsync(long ChatId)
+        private async Task ShowBranchDataAsKeyboardAsync(long chatId)
         {
             // clear previous Id whenever the keyboard is displayedi
-            await _userRepository.SetCurrentBranchIdToNull(ChatId);
+            await _userRepository.SetCurrentBranchIdToNull(chatId);
 
-            Dictionary<string, string> branchDataDictionary = new Dictionary<string, string>();
-            var userDetails = await _epumpDataRepository.GetUserDetailsAsync(ChatId);
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {userDetails.AuthKey}");
-            var companyBranchData = await client.GetAsync($"/Company/Branches/{userDetails.CompanyId}");
+            var userDetails = await _epumpDataRepository.GetUserDetailsAsync(chatId);
+            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {userDetails.AuthKey}");
+            var companyBranchData = await _client.GetAsync($"/Company/Branches/{userDetails.CompanyId}");
 
             var branchData = await JsonSerializer.DeserializeAsync<List<CompanyBranchInfo>>(companyBranchData.Content.ReadAsStreamAsync().Result);
-            foreach (var branch in branchData)
-            {
-                branchDataDictionary.Add(branch.name, branch.id);
-            }
+            var branchDataDictionary = branchData.ToDictionary(branch => branch.name, branch => branch.id);
             branchDataDictionary.Add("Back", "BranchReports");
 
             // selects and displays keyboard with branchId as callback data
-            var BranchKeyboard = new InlineKeyboardMarkup(branchDataDictionary.Select(x => new[] { InlineKeyboardButton.WithCallbackData(x.Key, x.Value) }));
-            await _botClient.SendTextMessageAsync(ChatId, "Select Branch", replyMarkup: BranchKeyboard);
+            var branchKeyboard = new InlineKeyboardMarkup(branchDataDictionary.Select(x => new[] { InlineKeyboardButton.WithCallbackData(x.Key, x.Value) }));
+            await _botClient.SendTextMessageAsync(chatId, "Select Branch", replyMarkup: branchKeyboard);
         }
     }
 }

@@ -16,49 +16,42 @@ namespace app.Components.Reports
 {
     public class BranchReports
     {
-        public HttpClient client;
+        private readonly HttpClient _client;
         private readonly ITelegramBotClient _botClient;
         private readonly IEpumpDataRepository _epumpDataRepository;
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IUserRepository _userRepository;
-        Stream Pdfreport = null;
-        string dateTimeFormat = "MMM dd, yyyy";
-        string endDate = DateTime.Today.ToString("MMM dd, yyyy");
+        private Stream _pdfReport;
+        private const string DateTimeFormat = "MMM dd, yyyy";
+        private readonly string _endDate = DateTime.Today.ToString("MMM dd, yyyy");
 
         public BranchReports(ITelegramBotClient botClient, IHttpClientFactory httpClientFactory, IEpumpDataRepository epumpDataRepository,
         IUserRepository userRepository)
         {
             _userRepository = userRepository;
             _epumpDataRepository = epumpDataRepository;
-            _httpClientFactory = httpClientFactory;
             _botClient = botClient;
-            client = _httpClientFactory.CreateClient("TestApi");
+            _client = httpClientFactory.CreateClient("TestApi");
         }
 
-        public string ConvertTextToDateTime(string dateTimeText)
+        private static string ConvertTextToDateTime(string dateTimeText)
         {
             // Epump's Date Format is "Jan 1st, 2021"
             // or "January 1, 2021"
-            switch (dateTimeText)
+            return dateTimeText switch
             {
-                case "Today":
-                    return DateTime.Today.ToString(dateTimeFormat);
-                case "Yesterday":
-                    return DateTime.Today.AddDays(-1).ToString(dateTimeFormat);
-                case "Week":
-                    return DateTime.Today.AddDays(-7).ToString(dateTimeFormat);
-                case "Month":
-                    return DateTime.Today.AddMonths(-1).ToString(dateTimeFormat);
-                default:
-                    return DateTime.Today.AddDays(-3).ToString(dateTimeFormat);
-            }
+                "Today" => DateTime.Today.ToString(DateTimeFormat),
+                "Yesterday" => DateTime.Today.AddDays(-1).ToString(DateTimeFormat),
+                "Week" => DateTime.Today.AddDays(-7).ToString(DateTimeFormat),
+                "Month" => DateTime.Today.AddMonths(-1).ToString(DateTimeFormat),
+                _ => DateTime.Today.AddDays(-3).ToString(DateTimeFormat)
+            };
         }
 
         public async Task<Message> SendBranchCashflowReportAsync(CallbackQuery query, Message message)
         {
             var userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
             var branchId = await _userRepository.GetCurrentBranchIdAsync(query.Message.Chat.Id);
-            string uri = $"EpumpReport/Branch/BranchCashFlowReport?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={endDate}";
+            var uri = $"EpumpReport/Branch/BranchCashFlowReport?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
 
             var content = await GetReportWithoutSummaryDataAsync(message, uri, userData);
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, $"BranchCashflowReport.pdf"));
@@ -68,7 +61,7 @@ namespace app.Components.Reports
         {
             var userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
             var branchId = await _userRepository.GetCurrentBranchIdAsync(query.Message.Chat.Id);
-            string uri = $"EpumpReport/Branch/BranchSalesTransactionReport?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={endDate}";
+            string uri = $"EpumpReport/Branch/BranchSalesTransactionReport?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
 
             var content = await GetReportWithSummaryDataAsync(message, uri, userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
@@ -83,14 +76,14 @@ Total DPK Volume Sold: {content.dpkVolumeSold}
 Total Volume Sold: {content.totalVolumeSold}
 ");
 
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(Pdfreport, $"BranchSalesTransactions.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"BranchSalesTransactions.pdf"));
         }
 
         public async Task<Message> SendBranchTankReportAsync(CallbackQuery query, Message message)
         {
             var userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
             var branchId = await _userRepository.GetCurrentBranchIdAsync(query.Message.Chat.Id);
-            string uri = $"EpumpReport/Branch/TankReport?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={endDate}";
+            string uri = $"EpumpReport/Branch/TankReport?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
 
             var content = await GetReportWithoutSummaryDataAsync(message, uri, userData);
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, $"BranchTankReport.pdf"));
@@ -116,16 +109,16 @@ Volume Discharged(Epump): {result.epumpDischarge}
 Volume Discharged(Manual): {result.manualDischarge}            
 ");
 
-            return await _botClient.SendDocumentAsync(message.Chat.Id, new InputOnlineFile(Pdfreport, $"BranchTanksFilledReport.pdf"));
+            return await _botClient.SendDocumentAsync(message.Chat.Id, new InputOnlineFile(_pdfReport, $"BranchTanksFilledReport.pdf"));
         }
 
         public string ValidateDateInput(Message message)
         {
             DateTime date;
 
-            if (DateTime.TryParseExact(message.Text, dateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+            if (DateTime.TryParseExact(message.Text, DateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
             {
-                return date.ToString(dateTimeFormat);
+                return date.ToString(DateTimeFormat);
             }
             else
             {
@@ -137,7 +130,7 @@ Volume Discharged(Manual): {result.manualDischarge}
         {
             var userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
             var branchId = await _userRepository.GetCurrentBranchIdAsync(query.Message.Chat.Id);
-            string uri = $"EpumpReport/Branch/BranchVarianceReport?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={endDate}";
+            string uri = $"EpumpReport/Branch/BranchVarianceReport?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
 
             var content = await GetReportWithSummaryDataAsync(message, uri, userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
@@ -146,14 +139,14 @@ Total Volume Sold(Manual): {content.totalManualVolumeSold}
 Variance: {content.totalVariance}
 ");
 
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(Pdfreport, $"BranchVarianceReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"BranchVarianceReport.pdf"));
         }
 
         public async Task<Message> SendProductSummaryReportAsync(CallbackQuery query, Message message)
         {
             var userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
             var branchId = await _userRepository.GetCurrentBranchIdAsync(query.Message.Chat.Id);
-            string uri = $"EpumpReport/Branch/BranchProductSummary?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={endDate}";
+            string uri = $"EpumpReport/Branch/BranchProductSummary?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
 
             var content = await GetReportWithSummaryDataAsync(message, uri, userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
@@ -168,23 +161,22 @@ DPK Volume Sold: {content.dpkVolumeSold}
 Total Volume Sold: {content.totalVolumeSold}
 ");
 
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(Pdfreport, $"ProductSummaryReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"ProductSummaryReport.pdf"));
         }
 
         private async Task<SummaryData> GetReportWithSummaryDataAsync(Message message, string uri, EpumpData userData)
         {
             // this makes it a little less repetitive
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {userData.AuthKey}");
+            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {userData.AuthKey}");
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, "Sending PDF...");
-            SummaryData result = null;
 
-            var response = await client.GetAsync(uri);
+            var response = await _client.GetAsync(uri);
             var content = await response.Content.ReadAsStreamAsync();
-            result = await JsonSerializer.DeserializeAsync<SummaryData>(content);
+            var result = await JsonSerializer.DeserializeAsync<SummaryData>(content);
 
-            Pdfreport = new MemoryStream(result.pdfReport);
+            _pdfReport = new MemoryStream(result.pdfReport);
             return result;
         }
 
@@ -192,11 +184,11 @@ Total Volume Sold: {content.totalVolumeSold}
         {
             // delete the message
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {userData.AuthKey}");
+            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {userData.AuthKey}");
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, "Sending PDF...");
 
-            var response = await client.GetAsync(uri);
+            var response = await _client.GetAsync(uri);
             var content = await response.Content.ReadAsStreamAsync();
             return content;
         }
