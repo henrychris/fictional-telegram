@@ -453,7 +453,7 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 app/appsettings.Development.json
-app/nlog.config
+
 /Logs
 app/Data/Migrations
-app/telegramData.db
+
