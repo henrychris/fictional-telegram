@@ -108,11 +108,22 @@ namespace app
 
             services.AddHttpClient("EpumpReportApi", client =>
             {
-                client.BaseAddress = new Uri(BotConfig.EpumpUri);
+                client.BaseAddress = new Uri(BotConfig.EpumpReportUri);
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+            services.AddHttpClient("TestApi", client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:5001/");
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+            services.AddHttpClient("EpumpApi", client =>
+            {
+                client.BaseAddress = new Uri(BotConfig.EpumpApiUri);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
 
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IEpumpDataRepository, EpumpDataRepository>();
 
             services.ConfigureLoggerService();
             services.ConfigureAutoMapper();
