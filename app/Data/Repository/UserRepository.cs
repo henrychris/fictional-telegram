@@ -19,7 +19,7 @@ namespace app.Data.Repository
         }
 
         // ! where AsNoTracking is Enabled, values can only be read.
-        // ! Db should not be updated.
+        // ! and db would not be updated.
 
         public async Task AddUserAsync(AppUser user)
         {
@@ -51,11 +51,11 @@ namespace app.Data.Repository
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
 
-        public string GetUserStateAsync(long chatId)
+        public async Task<string> GetUserStateAsync(long chatId)
         {
             _context.Users.AsNoTracking();
-            var user = _context.Users.FirstOrDefaultAsync(x =>x.ChatId == chatId).Result.State;
-            return user;
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.ChatId == chatId);
+            return user.State;
         }
 
         public async Task SetUserStateAsync(long chatId, string state)
@@ -96,6 +96,53 @@ namespace app.Data.Repository
         public void Update(AppUser user)
         {
             _context.Entry(user).State = EntityState.Modified;
+        }
+
+        public async Task SetCurrentBranchIdAsync(long chatId, string branchId)
+        {
+            using (var context = new DataContext())
+            {
+                var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+                if (user != null)
+                {
+                    user.CurrentBranch = branchId;
+                    await context.SaveChangesAsync();
+                }
+                else
+                {
+                    await _errorHandler.HandleErrorAsync(new Exception("User not found"));
+                }
+            }
+        }
+
+        public async Task SetCurrentBranchIdToNull(long chatId)
+        {
+            using (var context = new DataContext())
+            {
+                var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+                if (user != null)
+                {
+                    user.CurrentBranch = null;
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
+
+        public async Task<string> GetCurrentBranchIdAsync(long chatId)
+        {
+            AppUser user = null;
+            using (var context = new DataContext())
+            {
+                try
+                {
+                    user = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
+                }
+                catch (Exception e)
+                {
+                    System.Console.WriteLine(e.Message);
+                }
+                return user.CurrentBranch;
+            }
         }
     }
 }
