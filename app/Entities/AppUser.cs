@@ -9,10 +9,11 @@ namespace app.Entities
         [Required]
         public long ChatId { get; set; }
         [Required] public string FirstName { get; set; }
-        [Required] public string Username { get; set; }
+        public string Username { get; set; }
         public DateTime AuthDate { get; set; }
         public string Hash { get; set; }
         public string State { get; set; }
+        public string CurrentBranch { get; set; }
 
         public string EpumpDataId { get; set; }
         public virtual EpumpData EpumpData { get; set; }
