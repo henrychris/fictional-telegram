@@ -27,7 +27,7 @@ namespace app.Components.Reports
         {
             _epumpDataRepository = epumpDataRepository;
             _botClient = botClient;
-            _client = httpClientFactory.CreateClient("TestApi");
+            _client = httpClientFactory.CreateClient("EpumpReportApi");
         }
 
         private static string ConvertTextToDateTime(string dateTimeText)
