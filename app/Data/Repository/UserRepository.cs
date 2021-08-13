@@ -13,8 +13,11 @@ namespace app.Data.Repository
         private readonly ErrorHandler _errorHandler;
         public UserRepository(DataContext context, ErrorHandler errorHandler)
         {
+            // TODO check if the DI works properly
             _errorHandler = errorHandler;
             _context = context;
+            var x = _context.EpumpData.Find("1");
+            Console.WriteLine(x.CompanyId);
         }
 
         // ! where AsNoTracking is Enabled, values can only be read.
@@ -26,34 +29,31 @@ namespace app.Data.Repository
             await _context.SaveChangesAsync();
         }
 
-        public Task<bool> CheckUserExistsAsync(long chatId)
+        public async Task<bool> CheckUserExistsAsync(long chatId)
         {
-            _context.Users.AsNoTracking();
-            return _context.Users.AnyAsync(u => u.ChatId == chatId);
+            // ! Investigate the reason for the invalid operation exception.
+            return await _context.Users.AsNoTracking().AnyAsync(u => u.ChatId == chatId);
         }
 
         public async Task<AppUser> GetUserByIdAndUserNameAsync(long chatId, string username)
         {
-            _context.Users.AsNoTracking();
-            return await _context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId && u.Username == username);
+            return await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId && u.Username == username);
         }
 
         public async Task<AppUser> GetUserByIdAsync(long chatId)
         {
-            _context.Users.AsNoTracking();
-            return await _context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+            return await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
         }
 
         public async Task<AppUser> GetUserByUserNameAsync(string username)
         {
-            _context.Users.AsNoTracking();
-            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            return await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
         }
 
         public async Task<string> GetUserStateAsync(long chatId)
         {
-            _context.Users.AsNoTracking();
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.ChatId == chatId);
+            
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.ChatId == chatId);
             return user.State;
         }
 
@@ -66,14 +66,14 @@ namespace app.Data.Repository
                     To prevent this, i am using a new instance of the context.
                     It will be disposed automatically.
                 */
-                using (var context = new DataContext())
+                // using (var context = new DataContext())
                 {
-                    var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+                    var user = await _context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
                     if (user != null)
                     {
                         // user.State.Remove();
                         user.State = state;
-                        await context.SaveChangesAsync();
+                        await _context.SaveChangesAsync();
                     }
                     else
                     {
@@ -99,13 +99,13 @@ namespace app.Data.Repository
 
         public async Task SetCurrentBranchIdAsync(long chatId, string branchId)
         {
-            using (var context = new DataContext())
+            // using (var context = new DataContext())
             {
-                var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
                 if (user != null)
                 {
                     user.CurrentBranch = branchId;
-                    await context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
                 }
                 else
                 {
@@ -116,22 +116,22 @@ namespace app.Data.Repository
 
         public async Task SetCurrentBranchIdToNull(long chatId)
         {
-            await using var context = new DataContext();
-            var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+            // await using var context = new DataContext();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
             if (user != null)
             {
                 user.CurrentBranch = null;
-                await context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
         }
 
         public async Task<string> GetCurrentBranchIdAsync(long chatId)
         {
             AppUser user = null;
-            await using var context = new DataContext();
+            // await using var context = new DataContext();
             try
             {
-                user = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
+                user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
             }
             catch (Exception e)
             {
