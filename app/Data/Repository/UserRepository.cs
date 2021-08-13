@@ -16,8 +16,8 @@ namespace app.Data.Repository
             // TODO check if the DI works properly
             _errorHandler = errorHandler;
             _context = context;
-            var x = _context.EpumpData.Find("1");
-            Console.WriteLine(x.CompanyId);
+            // var x = _context.EpumpData.Find("1");
+            // Console.WriteLine(x.CompanyId);
         }
 
         // ! where AsNoTracking is Enabled, values can only be read.
