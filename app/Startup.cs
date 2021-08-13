@@ -18,6 +18,7 @@ using app.Interfaces;
 using app.Data.Repository;
 using app.Components.Reports;
 using Microsoft.AspNetCore.Http;
+using Npgsql;
 
 namespace app
 {
@@ -80,8 +81,9 @@ namespace app
                     var pgPass = pgUserPass.Split(":")[1];
                     var pgHost = pgHostPort.Split(":")[0];
                     var pgPort = pgHostPort.Split(":")[1];
+                    // SslMode = SslMode.Require, TrustServerCertificate = true
 
-                    connStr = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb}";
+                    connStr = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};SslMode=SslMode.Require;TrustServerCertificate=true";
                 }
 
                 // Whether the connection string came from the local development configuration file
