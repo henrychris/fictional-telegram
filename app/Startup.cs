@@ -83,7 +83,7 @@ namespace app
                     var pgPort = pgHostPort.Split(":")[1];
                     // SslMode = SslMode.Require, TrustServerCertificate = true
 
-                    connStr = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};Use SSL Stream=True;SSL Mode=Require;TrustServerCertificate=True;";
+                    connStr = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};SSL Mode=Require;TrustServerCertificate=True;";
                 }
 
                 // Whether the connection string came from the local development configuration file
