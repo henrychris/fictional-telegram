@@ -162,10 +162,15 @@ namespace app.Components.Reports
 
             var branchData = await JsonSerializer.DeserializeAsync<List<CompanyBranchInfo>>(companyBranchData.Content.ReadAsStreamAsync().Result);
             var branchDataDictionary = branchData.ToDictionary(branch => branch.name, branch => branch.id);
-            branchDataDictionary.Add("Back", "BranchReports");
+
+            SortedDictionary<string, string> sortedBranchDataDictionary = new(branchDataDictionary);
 
             // selects and displays keyboard with branchId as callback data
-            var branchKeyboard = new InlineKeyboardMarkup(branchDataDictionary.Select(x => new[] { InlineKeyboardButton.WithCallbackData(x.Key, x.Value) }));
+            var branchKeyboard = new InlineKeyboardMarkup(sortedBranchDataDictionary
+            .Select(x => new[] { InlineKeyboardButton.WithCallbackData(x.Key, x.Value) })
+            .Append(new[] { InlineKeyboardButton.WithCallbackData("Back", "BranchReports") })
+            .ToArray());
+
             await _botClient.SendTextMessageAsync(chatId, "Select Branch", replyMarkup: branchKeyboard);
         }
     }
