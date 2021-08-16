@@ -20,14 +20,16 @@ namespace app.Components.Reports
         private readonly ITelegramBotClient _botClient;
         private readonly IEpumpDataRepository _epumpDataRepository;
         private Stream _pdfReport;
-        private const string DateTimeFormat = "MMM dd, yyyy";
-        private readonly string _endDate = DateTime.Today.ToString("MMM dd, yyyy");
+        private const string DateTimeFormat = "yyyy-MM-dd";
+        private readonly string _endDate = DateTime.Today.ToString(DateTimeFormat);
         private EpumpData _userData;
         public CompanyReports(ITelegramBotClient botClient, IEpumpDataRepository epumpDataRepository, IHttpClientFactory httpClientFactory)
         {
             _epumpDataRepository = epumpDataRepository;
             _botClient = botClient;
-            _client = httpClientFactory.CreateClient("EpumpReportApi");
+            _client = httpClientFactory.CreateClient();
+            _client.BaseAddress = new Uri("https://pdf.epump.club/");
+            _client.DefaultRequestHeaders.Add("Accept", "application/json");
         }
 
         private static string ConvertTextToDateTime(string dateTimeText)
@@ -133,7 +135,7 @@ DPK Volume: {result.lpgVolume}
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"CompanyTankStockReport.pdf"));
         }
 
-        public async Task<Message> SendCompanyTanksFilledReportAsync( Message message)
+        public async Task<Message> SendCompanyTanksFilledReportAsync(Message message)
         {
             var date = ValidateDateInput(message);
             if (date == "Invalid Date")
@@ -169,8 +171,8 @@ Volume Discharged(Manual): {result.manualDischarge}
         public async Task<Message> SendCompanyVarianceReportAsync(CallbackQuery query, Message message)
         {
             _userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
+            // TODO NOT FOUND
             var uri = $"​EpumpReport​/Company​/CompanyVarianceReport?companyId={_userData.CompanyId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
-
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
@@ -184,7 +186,7 @@ Variance: {result.totalVariance}L");
         public async Task<Message> SendCompanyWalletFundRequestReportAsync(CallbackQuery query, Message message)
         {
             _userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
-            
+
             var uri = $"​EpumpReport/Company/Retainerships/WalletFundRequestReport?companyId={_userData.CompanyId}&status={query.Data}";
             try
             {
@@ -202,7 +204,7 @@ Variance: {result.totalVariance}L");
         public async Task<Message> SendCompanyWalletReportAsync(CallbackQuery query, Message message)
         {
             _userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
-            var uri = $"​EpumpReport/Company/Management/CompanyWalletReport?companyId={_userData.CompanyId}";
+            var uri = $"EpumpReport/Company/Management/CompanyWalletReport?companyId={_userData.CompanyId}";
 
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
@@ -229,7 +231,7 @@ Wallet BookBalance: ₦{result.walletBookBalance}
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {userData.AuthKey}");
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Sending PDF...");
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Sending PDF..."); 
 
             var response = await _client.GetAsync(uri);
             var content = await response.Content.ReadAsStreamAsync();
