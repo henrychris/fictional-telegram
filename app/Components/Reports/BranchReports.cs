@@ -22,7 +22,7 @@ namespace app.Components.Reports
         private readonly IUserRepository _userRepository;
         private Stream _pdfReport;
         private const string DateTimeFormat = "yyyy-MM-dd";
-        private readonly string _endDate = DateTime.Today.ToString("DateTimeFormat");
+        private readonly string _endDate = DateTime.Today.ToString("yyyy-MM-dd");
 
         public BranchReports(ITelegramBotClient botClient, IHttpClientFactory httpClientFactory, IEpumpDataRepository epumpDataRepository,
         IUserRepository userRepository)

@@ -21,15 +21,15 @@ namespace app.Components.Reports
         private readonly IEpumpDataRepository _epumpDataRepository;
         private Stream _pdfReport;
         private const string DateTimeFormat = "yyyy-MM-dd";
-        private readonly string _endDate = DateTime.Today.ToString(DateTimeFormat);
+        private readonly string _endDate = DateTime.Today.ToString("yyyy-MM-dd");
         private EpumpData _userData;
         public CompanyReports(ITelegramBotClient botClient, IEpumpDataRepository epumpDataRepository, IHttpClientFactory httpClientFactory)
         {
             _epumpDataRepository = epumpDataRepository;
             _botClient = botClient;
-            _client = httpClientFactory.CreateClient();
-            _client.BaseAddress = new Uri("https://pdf.epump.club/");
-            _client.DefaultRequestHeaders.Add("Accept", "application/json");
+            _client = httpClientFactory.CreateClient("EpumpReportApi");
+            // _client.BaseAddress = new Uri("https://pdf.epump.club/");
+            // _client.DefaultRequestHeaders.Add("Accept", "application/json");
         }
 
         private static string ConvertTextToDateTime(string dateTimeText)
