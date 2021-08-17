@@ -147,11 +147,11 @@ namespace app
                     .AddTypedClient<ITelegramBotClient>(httpClient
                         => new TelegramBotClient(BotConfig.BotToken, httpClient));
 
-            // services.AddHttpClient("EpumpReportApi", client =>
-            // {
-            //     client.BaseAddress = new Uri(BotConfig.EpumpReportUri);
-            //     client.DefaultRequestHeaders.Add("Accept", "application/json");
-            // });
+            services.AddHttpClient("EpumpReportApi", client =>
+            {
+                client.BaseAddress = new Uri(BotConfig.EpumpReportUri);
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
             services.AddHttpClient("TestApi", client =>
             {
                 client.BaseAddress = new Uri("https://localhost:5001/");
