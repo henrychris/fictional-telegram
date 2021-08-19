@@ -14,10 +14,13 @@ namespace app.Components
         private readonly ErrorHandler _errorHandler;
         private readonly IUserRepository _userRepository;
         private readonly BotConfiguration _botConfig;
+        private readonly IEpumpDataRepository _epumpDataRepository;
 
         public Keyboards(ITelegramBotClient botClient, ErrorHandler errorHandler,
-        IUserRepository userRepository, IConfiguration configuration)
+        IUserRepository userRepository, IConfiguration configuration,
+        IEpumpDataRepository epumpDataRepository)
         {
+            _epumpDataRepository = epumpDataRepository;
             _userRepository = userRepository;
             _errorHandler = errorHandler;
             _botClient = botClient;
@@ -26,7 +29,8 @@ namespace app.Components
         public async Task<Message> Start(Message message)
         {
             var chatDetails = message.Chat;
-            var userCheck = await _userRepository.CheckUserExistsAsync(message.Chat.Id);
+            var userCheck = await _userRepository.CheckUserExistsAsync(message.Chat.Id) &&
+            await _epumpDataRepository.CheckForChatIdAsync(message.Chat.Id);
             try
             {
                 if (userCheck)
@@ -73,7 +77,8 @@ You can control me with these commands:
         public async Task<Message> SendLoginKeyboard(Message message)
         {
             // user check to prevent multiple logins
-            var userCheck = await _userRepository.CheckUserExistsAsync(message.Chat.Id);
+            var userCheck = await _userRepository.CheckUserExistsAsync(message.Chat.Id)
+            && await _epumpDataRepository.CheckForChatIdAsync(message.Chat.Id);
             try
             {
                 // I might need to move this user check logic around
@@ -109,7 +114,8 @@ You can control me with these commands:
         public async Task<Message> SendReportKeyboard(Message message)
         {
             // add check to prevent users who aren't in the Db from accessing this.
-            if (await _userRepository.CheckUserExistsAsync(message.Chat.Id))
+            if (await _userRepository.CheckUserExistsAsync(message.Chat.Id)
+                && await _epumpDataRepository.CheckForChatIdAsync(message.Chat.Id))
             {
                 await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
                 InlineKeyboardMarkup reportKeyboard = new(new[]

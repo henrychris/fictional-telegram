@@ -47,7 +47,7 @@ namespace app.Controllers
 
             var user = _mapper.Map<AppUser>(data);
 
-            if (await _userRepository.CheckUserExistsAsync(user.ChatId))
+            if (await _userRepository.CheckUserExistsAsync(user.ChatId) & await _epumpDataRepository.CheckForChatIdAsync(user.ChatId))
             {
                 return BadRequest("User already exists");
             }
@@ -66,7 +66,7 @@ namespace app.Controllers
             if (data == null || data.EpumpId == null) return BadRequest("No data");
 
             var user = _mapper.Map<EpumpData>(data);
-            var check = await _epumpDataRepository.CheckUserExistsAsync(user.ID);
+            var check = await _epumpDataRepository.CheckUserExistsAsync(user.ID) & await _userRepository.CheckForEpumpIdAsync(user.ID);
             if (check)
             {
                 return BadRequest("User already exists");
