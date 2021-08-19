@@ -65,6 +65,7 @@ namespace app.Services
                 "Tanks Filled" => _branchReportsKeyboards.GetIdForBranchTanksFilledReport(callbackQuery.Message),
                 "Variance" => _branchReportsKeyboards.GetIdForBranchVarianceReport(callbackQuery.Message),
                 "Tank Report" => _branchReportsKeyboards.GetIdForBranchTankReport(callbackQuery.Message),
+                "Branch POS Transactions" => _branchReportsKeyboards.GetIdForBranchPOSTransactionsReport(callbackQuery.Message),
 
                 // Company Reports
                 "Branch Sales" => _companyReportsKeyboards.SendCompanyBranchSalesReportKeyboard(callbackQuery.Message),
@@ -72,6 +73,7 @@ namespace app.Services
                 "Sales Summary" => _companyReportsKeyboards.SendCompanySalesSummaryReportKeyboard(callbackQuery.Message),
                 "Company Tanks Filled" => _companyReportsKeyboards.SendCompanyTanksFilledReportKeyboard(callbackQuery.Message),
                 "Company Variance" => _companyReportsKeyboards.SendCompanyVarianceReportKeyboard(callbackQuery.Message),
+                "Company POS Transactions" => _companyReportsKeyboards.SendCompanyPOSTransactionsReportKeyboard(callbackQuery.Message),
 
                 // these don't require a date parameter
                 "Expense Categories" => _companyReports.SendCompanyExpenseCategoriesReportAsync(callbackQuery, callbackQuery.Message),
@@ -221,6 +223,12 @@ namespace app.Services
                 case "BranchTankReportID":
                     response = await _branchReportsKeyboards.SendBranchTankReportKeyboard(query, query.Message);
                     break;
+                case "BranchPOSTransactionsID":
+                    response = await _branchReportsKeyboards.SendBranchPOSTransactionsReportKeyboard(query, query.Message);
+                    break;
+                case "BranchPOSTransactions":
+                    response = await _branchReports.SendBranchPOSTransactionsReportAsync(query, query.Message);
+                    break;
 
                 // Company Level
                 case "CompanyBranchSalesReport":
@@ -249,6 +257,9 @@ namespace app.Services
                     break;
                 case "CompanyWalletFundRequestReport":
                     response = await _companyReports.SendCompanyWalletFundRequestReportAsync(query, query.Message);
+                    break;
+                case "CompanyPOSTransactionsReport":
+                    response = await _companyReports.SendCompanyPOSTransactionsReportAsync(query, query.Message);
                     break;
                 default:
                     response = await UnknownCommand(query.Message);
