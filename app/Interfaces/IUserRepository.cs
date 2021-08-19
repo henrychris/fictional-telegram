@@ -8,6 +8,7 @@ namespace app.Interfaces
     {
         Task AddUserAsync(AppUser user);
         Task<bool> CheckUserExistsAsync(long chatId);
+        Task<bool> CheckForEpumpIdAsync(string id);
         Task<AppUser> GetUserByIdAndUserNameAsync(long chatId, string username);
         Task<AppUser> GetUserByIdAsync(long chatId);
         Task<string> GetUserStateAsync(long chatId);

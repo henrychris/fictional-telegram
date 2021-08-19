@@ -34,6 +34,14 @@ namespace app.Data.Repository
             }
         }
 
+        public async Task<bool> CheckForChatIdAsync(long chatId)
+        {
+            using (var context = new DataContext())
+            {
+                return await context.EpumpData.AsNoTracking().AnyAsync(e => e.ChatId == chatId);
+            }
+        }
+
         public async Task<string> GetUserCompanyId(long chatId)
         {
             await using var context = new DataContext();
