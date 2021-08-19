@@ -89,6 +89,21 @@ Total Volume Sold: {content.totalVolumeSold}
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, $"BranchTankReport.pdf"));
         }
 
+        public async Task<Message> SendBranchPOSTransactionsReportAsync(CallbackQuery query, Message message)
+        {
+            var userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
+            var branchId = await _userRepository.GetCurrentBranchIdAsync(query.Message.Chat.Id);
+            string uri = $"EpumpReport/PosTransactionReport?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
+
+            var result = await GetReportWithSummaryDataAsync(message, uri, userData);
+            await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
+Amount of cashbacks : {result.cashbackAmount}
+Failed Transactions: {result.failedAmount}
+Succesful Transactions: {result.succesfulAmount}
+");
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"POS Transactions Report.pdf"));
+        }   
+
         public async Task<Message> SendBranchTanksFilledReportAsync(Message message)
         {
             var date = ValidateDateInput(message);

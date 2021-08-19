@@ -76,6 +76,8 @@ You can control me with these commands:
             var userCheck = await _userRepository.CheckUserExistsAsync(message.Chat.Id);
             try
             {
+                // I might need to move this user check logic around
+                // TODO userCheck should cover both DBs
                 if (userCheck)
                 {
                     await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
@@ -94,9 +96,7 @@ You can control me with these commands:
             {
                 new []
                 {
-                    // url to login page.
-                    InlineKeyboardButton.WithUrl("Login", _botConfig.LoginUrl)
-                    // InlineKeyboardButton.WithUrl("Open Login Page", "https://cutt.ly/YmHIFok")
+                    InlineKeyboardButton.WithUrl("Login", _botConfig.TelegramLoginUrl),
                 },
                 new []
                 {
@@ -127,7 +127,7 @@ You can control me with these commands:
                 return await _botClient.SendTextMessageAsync(message.Chat.Id, "Choose a Report", replyMarkup: reportKeyboard);
             }
 
-            else 
+            else
             {
                 return await _botClient.SendTextMessageAsync(message.Chat.Id, "You are not logged in!\nUse /menu to get started");
             }
@@ -170,6 +170,10 @@ You can control me with these commands:
                 },
                 new []
                 {
+                    InlineKeyboardButton.WithCallbackData("Company POS Transactions"),
+                },
+                new []
+                {
                     InlineKeyboardButton.WithCallbackData("Back", "Reports")
                 }
             });
@@ -195,6 +199,10 @@ You can control me with these commands:
                 {
                     InlineKeyboardButton.WithCallbackData("Variance"),
                     InlineKeyboardButton.WithCallbackData("Tank Report")
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Branch POS Transactions"),
                 },
                 new []
                 {

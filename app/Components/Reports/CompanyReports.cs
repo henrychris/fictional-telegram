@@ -201,6 +201,21 @@ Variance: {result.totalVariance}L");
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"WalletFundRequest.pdf"));
         }
 
+        public async Task<Message> SendCompanyPOSTransactionsReportAsync(CallbackQuery query, Message message)
+        {
+            // TODO Not Found
+            _userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
+            var uri = $"EpumpReport​/PosTransactionReport?companyId={_userData.CompanyId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
+
+            var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
+            await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
+Amount of cashbacks : {result.cashbackAmount}
+Failed Transactions: {result.failedAmount}
+Succesful Transactions: {result.succesfulAmount}
+");
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"Pos Transactions Report.pdf"));
+        }
+
         public async Task<Message> SendCompanyWalletReportAsync(CallbackQuery query, Message message)
         {
             _userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
@@ -209,8 +224,8 @@ Variance: {result.totalVariance}L");
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
-Wallet Balance: ₦{result.walletBalance}
-Wallet BookBalance: ₦{result.walletBookBalance}
+Wallet Balance: {ParseAsCurrency(result.walletBalance)}
+Wallet BookBalance: {ParseAsCurrency(result.walletBookBalance)}
 ");
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"CompanyWalletReport.pdf"));
         }
@@ -231,7 +246,7 @@ Wallet BookBalance: ₦{result.walletBookBalance}
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {userData.AuthKey}");
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Sending PDF..."); 
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Sending PDF...");
 
             var response = await _client.GetAsync(uri);
             var content = await response.Content.ReadAsStreamAsync();
@@ -253,6 +268,12 @@ Wallet BookBalance: ₦{result.walletBookBalance}
             var response = await _client.GetAsync(uri);
             var content = await response.Content.ReadAsStreamAsync();
             return content;
+        }
+
+        private string ParseAsCurrency(string value)
+        {
+            var x = Convert.ToDouble(value);
+            return x.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")));
         }
     }
 }

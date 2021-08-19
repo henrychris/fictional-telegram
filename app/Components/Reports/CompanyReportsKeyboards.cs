@@ -134,6 +134,14 @@ namespace app.Components.Reports
             await _userRepository.SetUserStateAsync(message.Chat.Id, "CompanyRetainershipReport");
         }
 
+        public async Task SendCompanyPOSTransactionsReportKeyboard(Message message)
+        {
+            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the POS-Transactions report", replyMarkup: _keyboard);
+            await _userRepository.SetUserStateAsync(message.Chat.Id, "CompanyPOSTransactionsReport");
+        }
+
         public async Task SendCompanyWalletFundRequestReportKeyboard(Message message)
         {
             // delete last message

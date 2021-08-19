@@ -151,6 +151,24 @@ namespace app.Components.Reports
             return null;
         }
 
+        public async Task GetIdForBranchPOSTransactionsReport(Message message)
+        {
+            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+            await ShowBranchDataAsKeyboardAsync(message.Chat.Id);
+            await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchPOSTransactionsID");
+        }
+
+        public async Task<Message> SendBranchPOSTransactionsReportKeyboard(CallbackQuery query, Message message)
+        {
+            await _userRepository.SetCurrentBranchIdAsync(message.Chat.Id, query.Data);
+            // delete last message
+            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Select a time range for the POS Transactions report", replyMarkup: _keyboard);
+            await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchPOSTransactions");
+            return null;
+        }
+
         private async Task ShowBranchDataAsKeyboardAsync(long chatId)
         {
             // clear previous Id whenever the keyboard is displayedi
