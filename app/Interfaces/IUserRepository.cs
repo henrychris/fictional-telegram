@@ -18,5 +18,6 @@ namespace app.Interfaces
         Task SetCurrentBranchIdAsync(long chatId, string branchId);
         Task SetCurrentBranchIdToNull(long chatId);
         void Update(AppUser user);
+        Task FindAndUpdateUserWithEpumpDataAsync(long chatId, string epumpId);
     }
 }

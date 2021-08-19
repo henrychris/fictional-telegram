@@ -16,8 +16,6 @@ namespace app.Data.Repository
             // TODO check if the DI works properly
             _errorHandler = errorHandler;
             _context = context;
-            // var x = _context.EpumpData.Find("1");
-            // Console.WriteLine(x.CompanyId);
         }
 
         // ! where AsNoTracking is Enabled, values can only be read.
@@ -159,6 +157,18 @@ namespace app.Data.Repository
 
             // Whenever there is a null value, it shall return null
             return user?.CurrentBranch;
+        }
+
+        public async Task FindAndUpdateUserWithEpumpDataAsync(long chatId, string epumpId)
+        {
+            await using var context = new DataContext();
+
+            var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+            if (user != null)
+            {
+                user.EpumpDataId = epumpId;
+                await context.SaveChangesAsync();
+            }
         }
     }
 }
