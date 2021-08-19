@@ -1,5 +1,10 @@
 using System;
+using System.Threading.Tasks;
+using app.Components;
+using app.Data;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace app
@@ -7,9 +12,26 @@ namespace app
     public class Program
     {
         protected static DateTime ServerStart;
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+            using var scope = host.Services.CreateScope();
+            var services = scope.ServiceProvider;
+
+            try
+            {
+                var context = services.GetRequiredService<DataContext>();
+                await context.Database.MigrateAsync();
+                await Seed.SeedUsers(context);
+            }
+            catch (Exception ex)
+            {
+                var errorHandler = services.GetRequiredService<ErrorHandler>();
+                await errorHandler.HandleErrorAsync(ex);
+                Console.WriteLine("An error occurred during migration.");
+            }
+
+            await host.RunAsync();
             ServerStart = DateTime.Now;
         }
 
@@ -18,7 +40,6 @@ namespace app
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    // webBuilder.UseUrls("http://localhost:80");
                 });
     }
 }

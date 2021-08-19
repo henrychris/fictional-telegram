@@ -1,0 +1,15 @@
+[{
+        "ID": "1",
+        "ChatId": 926122532,
+        "CompanyId": "b2e245d3-dd83-40fd-8bd5-53bd32810744",
+        "AuthKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtaGl6cGhhdnZ5QGdtYWlsLmNvbSIsImp0aSI6IjYzM2I0MjQ5LTFiODAtNGEyNC1iMWE3LTBjMTJkYmQwZmE1ZCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6WyJWaWV3T3V0bGV0IiwiQ29tcGFueVByaWNlIiwiTWFuYWdlUmV0YWluZXJzXHJcbiIsIk1hbmFnZVpvbmVzIiwiVmlld0JhbmtMb2ciLCJWaWV3QmFua0RlcG9zaXQiLCJNYW5hZ2VQYXltZW50cyIsIkNvbXBhbnlBZG1pbiIsIlZpZXdSZXRhaW5lcnMiLCJDb21wYW55IiwiVmlld0JhbmtEZXBvc2l0IiwiU2V0dXBCYW5rIiwiTWFuYWdlT3V0bGV0IiwiVmlld0V4cGVuc2UiLCJSZW1pcyIsIk1hbmFnZUV4cGVuc2UiLCJDb21wYW55UmVwb3J0Il0sIm5iZiI6MTYyNzk5MjY4MywiZXhwIjoxNzE0MzkyNjgzLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo0NDM0MyIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjQ0MzQzIn0.K3uHfZGG8qJlwQeS36HJ1-9zaxSYu2iWEkVQ5nSPffs",
+        "Role": "Admin"
+    },
+    {
+        "ID": "2",
+        "ChatId": 817654635,
+        "CompanyId": "727fa156-f310-4159-b1f2-a8e05de50e4b",
+        "AuthKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJvbGFAbWFpbGluYXRvci5jb20iLCJqdGkiOiJlMDc1YTg4OS1mMzA1LTQwNDItYWQ2Ny1kZThiMjhmYzcxZmQiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOlsiQ29tcGFueUFkbWluIiwiQ3VzdG9tZXIiXSwibmJmIjoxNjI2MDgwNjE4LCJleHAiOjE3MTI0ODA2MTgsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjQ0MzQzIiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzNDMifQ.bKZ82VYJ0160Fx2y76puVZ14sYGMoZs1UMdzKg7LIWY",
+        "Role": "Admin"
+    }
+]
