@@ -39,7 +39,8 @@ namespace app.Data.Migrations
                         column: x => x.EpumpDataId,
                         principalTable: "EpumpData",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull,
+                        onUpdate: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,7 +65,8 @@ namespace app.Data.Migrations
                         column: x => x.EpumpDataId,
                         principalTable: "EpumpData",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onUpdate: ReferentialAction.Cascade,
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateIndex(
