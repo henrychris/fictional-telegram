@@ -40,7 +40,7 @@ namespace app.Controllers
         That way info can be updated wherever it is missing.
         */
 
-        [HttpPost("/register")]
+        [HttpGet("/register")]
         public async Task<ActionResult<TelegramUserDto>> RegisterUser([FromQuery] TelegramUserDto data)
         {
             if (data == null) return BadRequest("No data");
