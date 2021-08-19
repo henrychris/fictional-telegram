@@ -17,6 +17,23 @@ namespace app.Data.Repository
             _errorHandler = errorHandler;
         }
 
+        public async Task AddUserAsync(EpumpData user)
+        {
+            using (var context = new DataContext())
+            {
+                await context.EpumpData.AddAsync(user);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> CheckUserExistsAsync(string epumpId)
+        {
+            using (var context = new DataContext())
+            {
+                return await context.EpumpData.AsNoTracking().AnyAsync(e => e.ID == epumpId);
+            }
+        }
+
         public async Task<string> GetUserCompanyId(long chatId)
         {
             await using var context = new DataContext();
