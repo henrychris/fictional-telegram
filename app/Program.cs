@@ -17,7 +17,7 @@ namespace app
             var host = CreateHostBuilder(args).Build();
             using var scope = host.Services.CreateScope();
             var services = scope.ServiceProvider;
-
+            ServerStart = DateTime.Now;
             try
             {
                 var context = services.GetRequiredService<DataContext>();
@@ -32,7 +32,6 @@ namespace app
             }
 
             await host.RunAsync();
-            ServerStart = DateTime.Now;
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

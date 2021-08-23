@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NLog;
 using Telegram.Bot;
@@ -18,7 +17,7 @@ using app.Interfaces;
 using app.Data.Repository;
 using app.Components.Reports;
 using Microsoft.AspNetCore.Http;
-using Npgsql;
+using app.Middleware;
 
 namespace app
 {
@@ -49,10 +48,6 @@ namespace app
 
         public static void ConfigureDbContext(this IServiceCollection services, string dbConnectionString)
         {
-            // services.AddDbContext<DataContext>(options =>
-            // {
-            //     options.UseNpgsql(dbConnectionString);
-            // });
             services.AddDbContext<DataContext>(options =>
             {
                 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -107,12 +102,10 @@ namespace app
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "app v1"));
-            }
+            app.UseMiddleware<ExceptionMiddleware>();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "app v1"));
 
             app.UseHttpsRedirection();
 

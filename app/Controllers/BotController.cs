@@ -34,6 +34,7 @@ namespace app.Controllers
         // TODO
         /*
         Rewrite the user check method. Check both databases.
+        ! Create a DB to store login status
         However. If the login method performs this check,
         it won't be needed here.
         Maybe, perform checks in both DBs. 
@@ -54,6 +55,7 @@ namespace app.Controllers
             else
             {
                 await _userRepository.AddUserAsync(user);
+                _logger.LogInfo($"User {user.ChatId} registered.");
                 // redirects user to epump login page
                 return Redirect("https://epump-login-test.herokuapp.com/");
             }
@@ -74,7 +76,9 @@ namespace app.Controllers
             else
             {
                 await _epumpDataRepository.AddUserAsync(user);
+                _logger.LogInfo($"User {user.ChatId}, EpumpID: {user.ID} registered.");
                 await _userRepository.FindAndUpdateUserWithEpumpDataAsync(user.ChatId, user.ID);
+                _logger.LogInfo($"User {user.ChatId} database entry updated with EpumpID: {user.ID}");
                 return Ok("Success");
             }
         }
@@ -82,15 +86,8 @@ namespace app.Controllers
         [HttpPost("/notification")]
         public async Task<ActionResult> SendUserNotification([FromBody] NotificationDto data)
         {
-            try
-            {
-                await _botClient.SendTextMessageAsync(data.ChatId, $"*Epump Notification*\n\n{data.Message}", parseMode: ParseMode.Markdown);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-                return BadRequest(e.Message);
-            }
+            await _botClient.SendTextMessageAsync(data.ChatId, $"*Epump Notification*\n\n{data.Message}", parseMode: ParseMode.Markdown);
+            _logger.LogInfo($"Notification sent to {data.ChatId} at{DateTime.Now}");
             return Ok("Message Sent");
         }
     }

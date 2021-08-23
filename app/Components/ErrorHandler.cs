@@ -21,7 +21,7 @@ namespace app.Components
                 _ => exception.ToString()
             };
 
-            _logger.LogError(errorMessage);
+            _logger.LogError(exception, errorMessage);
             return Task.CompletedTask;
         }
     }
