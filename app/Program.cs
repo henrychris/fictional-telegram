@@ -22,7 +22,7 @@ namespace app
             {
                 var context = services.GetRequiredService<DataContext>();
                 await context.Database.MigrateAsync();
-                await Seed.SeedUsers(context);
+                await Seed.SeedDataBase(context);
             }
             catch (Exception ex)
             {

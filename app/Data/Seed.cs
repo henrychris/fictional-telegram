@@ -11,6 +11,15 @@ namespace app.Data
 {
     public class Seed
     {
+        public static async Task SeedDataBase(DataContext context)
+        {
+            await SeedUsers(context);
+            await SeedEpumpData(context);
+            await SeedLoginData(context);
+
+            await context.SaveChangesAsync();
+        }
+
         public static async Task SeedUsers(DataContext context)
         {
             // check if database has any data
@@ -24,7 +33,10 @@ namespace app.Data
             {
                 context.Users.Add(user);
             }
+        }
 
+        public static async Task SeedEpumpData(DataContext context)
+        {
             var epumpData = await File.ReadAllTextAsync("Data/EpumpDataSeed.json");
             var epumpDataList = JsonSerializer.Deserialize<List<EpumpData>>(epumpData);
 
@@ -39,8 +51,18 @@ namespace app.Data
                     userToUpdate.EpumpDataId = item.ID;
                 }
             }
+        }
 
-            await context.SaveChangesAsync();
+        public static async Task SeedLoginData(DataContext context)
+        {
+            var loginData = await File.ReadAllTextAsync("Data/LoginStatus.json");
+            var loginStatusList = JsonSerializer.Deserialize<List<LoginStatus>>(loginData);
+
+            // create login status of class LoginStatus
+            foreach (var item in loginStatusList)
+            {
+                context.loginStatus.Add(item);
+            }
         }
     }
 }
