@@ -89,7 +89,7 @@ Total Volume Sold: {content.totalVolumeSold}
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, $"BranchTankReport.pdf"));
         }
 
-        public async Task<Message> SendBranchPOSTransactionsReportAsync(CallbackQuery query, Message message)
+        public async Task<Message> SendBranchPosTransactionsReportAsync(CallbackQuery query, Message message)
         {
             var userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
             var branchId = await _userRepository.GetCurrentBranchIdAsync(query.Message.Chat.Id);
@@ -186,8 +186,10 @@ Total Volume Sold: {content.totalVolumeSold}
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {userData.AuthKey}");
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, "Sending PDF...");
+            
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
+            var response = await _client.SendAsync(requestMessage);
 
-            var response = await _client.GetAsync(uri);
             var content = await response.Content.ReadAsStreamAsync();
             var result = await JsonSerializer.DeserializeAsync<SummaryData>(content);
 

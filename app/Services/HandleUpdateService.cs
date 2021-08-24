@@ -227,7 +227,7 @@ namespace app.Services
                     response = await _branchReportsKeyboards.SendBranchPOSTransactionsReportKeyboard(query, query.Message);
                     break;
                 case "BranchPOSTransactions":
-                    response = await _branchReports.SendBranchPOSTransactionsReportAsync(query, query.Message);
+                    response = await _branchReports.SendBranchPosTransactionsReportAsync(query, query.Message);
                     break;
 
                 // Company Level
@@ -259,7 +259,7 @@ namespace app.Services
                     response = await _companyReports.SendCompanyWalletFundRequestReportAsync(query, query.Message);
                     break;
                 case "CompanyPOSTransactionsReport":
-                    response = await _companyReports.SendCompanyPOSTransactionsReportAsync(query, query.Message);
+                    response = await _companyReports.SendCompanyPosTransactionsReportAsync(query, query.Message);
                     break;
                 default:
                     response = await UnknownCommand(query.Message);
