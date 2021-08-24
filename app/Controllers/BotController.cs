@@ -41,7 +41,7 @@ namespace app.Controllers
         That way info can be updated wherever it is missing.
         */
 
-        [HttpGet("/register")]
+        [HttpGet("register")]
         public async Task<ActionResult<TelegramUserDto>> RegisterUser([FromQuery] TelegramUserDto data)
         {
             if (data == null) return BadRequest("No data");
@@ -61,7 +61,7 @@ namespace app.Controllers
             }
         }
 
-        [HttpPost("/register/epump")]
+        [HttpPost("register/epump")]
         public async Task<ActionResult> RegisterEpumpUser(EpumpDataDto data)
         {
             // If the epump Id(PK) is missing, it can't be added to the db anyway.
@@ -79,11 +79,11 @@ namespace app.Controllers
                 _logger.LogInfo($"User {user.ChatId}, EpumpID: {user.ID} registered.");
                 await _userRepository.FindAndUpdateUserWithEpumpDataAsync(user.ChatId, user.ID);
                 _logger.LogInfo($"User {user.ChatId} database entry updated with EpumpID: {user.ID}");
-                return Ok("Success");
+                return StatusCode(201);
             }
         }
 
-        [HttpPost("/notification")]
+        [HttpPost("notification")]
         public async Task<ActionResult> SendUserNotification([FromBody] NotificationDto data)
         {
             await _botClient.SendTextMessageAsync(data.ChatId, $"*Epump Notification*\n\n{data.Message}", parseMode: ParseMode.Markdown);
