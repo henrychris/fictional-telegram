@@ -65,6 +65,7 @@ namespace app.Data
 
         public DbSet<AppUser> Users { get; set; }
         public DbSet<EpumpData> EpumpData { get; set; }
-        public DbSet<LoginStatus> loginStatus { get; set; }
+        public DbSet<LoginStatusTelegram> loginStatusTelegram { get; set; }
+        public DbSet<LoginStatusEpump> loginStatusEpump { get; set; }
     }
 }
