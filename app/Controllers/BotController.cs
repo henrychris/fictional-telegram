@@ -31,16 +31,6 @@ namespace app.Controllers
             _mapper = mapper;
         }
 
-        // TODO
-        /*
-        Rewrite the user check method. Check both databases.
-        ! Create a DB to store login status
-        However. If the login method performs this check,
-        it won't be needed here.
-        Maybe, perform checks in both DBs. 
-        That way info can be updated wherever it is missing.
-        */
-
         [HttpGet("register")]
         public async Task<ActionResult<TelegramUserDto>> RegisterUser([FromQuery] TelegramUserDto data)
         {
