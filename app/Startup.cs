@@ -4,20 +4,20 @@ using Contracts;
 using LoggerService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using NLog;
 using Telegram.Bot;
 using app.Components;
-using app.Services;
-using app.Data;
-using Microsoft.EntityFrameworkCore;
-using app.Interfaces;
-using app.Data.Repository;
 using app.Components.Reports;
-using Microsoft.AspNetCore.Http;
+using app.Data;
+using app.Data.Repository;
+using app.Interfaces;
 using app.Middleware;
+using app.Services;
 
 namespace app
 {
@@ -40,10 +40,6 @@ namespace app
         public static void ConfigureAutoMapper(this IServiceCollection services)
         {
             services.AddAutoMapper(typeof(Startup));
-        }
-        public static void ConfigureLoggerService(this IServiceCollection services)
-        {
-            services.AddSingleton<ILoggerManager, LoggerManager>();
         }
 
         public static void ConfigureDbContext(this IServiceCollection services, string dbConnectionString)
@@ -86,6 +82,10 @@ namespace app
                 options.UseNpgsql(connStr);
             });
         }
+        public static void ConfigureLoggerService(this IServiceCollection services)
+        {
+            services.AddSingleton<ILoggerManager, LoggerManager>();
+        }
     }
     public class Startup
     {
@@ -95,9 +95,9 @@ namespace app
             LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
             BotConfig = Configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
         }
+        private BotConfiguration BotConfig { get; }
 
         private IConfiguration Configuration { get; }
-        private BotConfiguration BotConfig { get; }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -158,6 +158,7 @@ namespace app
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IEpumpDataRepository, EpumpDataRepository>();
+            services.AddScoped<ILoginStatusRepository, LoginStatusMethods>();
 
             services.ConfigureLoggerService();
             services.ConfigureAutoMapper();

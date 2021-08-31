@@ -20,26 +20,18 @@ namespace app.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IEpumpDataRepository _epumpDataRepository;
         private readonly ITelegramBotClient _botClient;
+        private readonly ILoginStatusRepository _loginStatusRepository;
 
         public BotController(IMapper mapper, ILoggerManager logger, IUserRepository userRepository, IEpumpDataRepository epumpDataRepository,
-        ITelegramBotClient botClient)
+        ITelegramBotClient botClient, ILoginStatusRepository loginStatusRepository)
         {
+            _loginStatusRepository = loginStatusRepository;
             _botClient = botClient;
             _epumpDataRepository = epumpDataRepository;
             _userRepository = userRepository;
             _logger = logger;
             _mapper = mapper;
         }
-
-        // TODO
-        /*
-        Rewrite the user check method. Check both databases.
-        ! Create a DB to store login status
-        However. If the login method performs this check,
-        it won't be needed here.
-        Maybe, perform checks in both DBs. 
-        That way info can be updated wherever it is missing.
-        */
 
         [HttpGet("register")]
         public async Task<ActionResult<TelegramUserDto>> RegisterUser([FromQuery] TelegramUserDto data)
@@ -48,14 +40,21 @@ namespace app.Controllers
 
             var user = _mapper.Map<AppUser>(data);
 
-            if (await _userRepository.CheckUserExistsAsync(user.ChatId) & await _epumpDataRepository.CheckForChatIdAsync(user.ChatId))
+            if (await _loginStatusRepository.IsUserLoggedInAsync_Telegram(user.ChatId))
             {
                 return BadRequest("User already exists");
             }
             else
             {
                 await _userRepository.AddUserAsync(user);
-                _logger.LogInfo($"User {user.ChatId} registered.");
+                await _loginStatusRepository.AddAsync(new LoginStatusTelegram
+                {
+                    UserChatId = user.ChatId,
+                    LoginDate = DateTime.Now,
+                    IsLoggedIn = true
+                });
+
+                _logger.LogInfo($"User {user.FirstName} with ID {user.ChatId} has been added to the database, at {DateTime.Now}");
                 // redirects user to epump login page
                 return Redirect("https://epump-login-test.herokuapp.com/");
             }
@@ -68,7 +67,7 @@ namespace app.Controllers
             if (data == null || data.EpumpId == null) return BadRequest("No data");
 
             var user = _mapper.Map<EpumpData>(data);
-            var check = await _epumpDataRepository.CheckUserExistsAsync(user.ID) & await _userRepository.CheckForEpumpIdAsync(user.ID);
+            var check = await _loginStatusRepository.IsUserLoggedInAsync(user.ChatId, user.ID);
             if (check)
             {
                 return BadRequest("User already exists");
@@ -77,8 +76,17 @@ namespace app.Controllers
             {
                 await _epumpDataRepository.AddUserAsync(user);
                 _logger.LogInfo($"User {user.ChatId}, EpumpID: {user.ID} registered.");
+
                 await _userRepository.FindAndUpdateUserWithEpumpDataAsync(user.ChatId, user.ID);
                 _logger.LogInfo($"User {user.ChatId} database entry updated with EpumpID: {user.ID}");
+
+                await _loginStatusRepository.AddAsync(new LoginStatusEpump
+                {
+                    EpumpDataId = user.ID,
+                    LoginDate = DateTime.Now,
+                    IsLoggedIn = true
+                });
+                _logger.LogInfo($"User {user.ID} has been fully added to the database, at {DateTime.Now}");
                 return StatusCode(201);
             }
         }
@@ -87,7 +95,7 @@ namespace app.Controllers
         public async Task<ActionResult> SendUserNotification([FromBody] NotificationDto data)
         {
             await _botClient.SendTextMessageAsync(data.ChatId, $"*Epump Notification*\n\n{data.Message}", parseMode: ParseMode.Markdown);
-            _logger.LogInfo($"Notification sent to {data.ChatId} at{DateTime.Now}");
+            _logger.LogInfo($"Notification sent to {data.ChatId} at{DateTime.Now}.");
             return Ok("Message Sent");
         }
     }
