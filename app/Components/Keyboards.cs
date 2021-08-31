@@ -1,9 +1,9 @@
-using System;
 using System.Threading.Tasks;
 using app.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace app.Components
@@ -15,6 +15,7 @@ namespace app.Components
         private readonly IUserRepository _userRepository;
         private readonly BotConfiguration _botConfig;
         private readonly IEpumpDataRepository _epumpDataRepository;
+        InlineKeyboardMarkup loginKeyboard;
 
         public Keyboards(ITelegramBotClient botClient, ErrorHandler errorHandler,
         IUserRepository userRepository, IConfiguration configuration,
@@ -29,24 +30,40 @@ namespace app.Components
         public async Task<Message> Start(Message message)
         {
             var chatDetails = message.Chat;
-            var userCheck = await _userRepository.CheckUserExistsAsync(message.Chat.Id) &&
-            await _epumpDataRepository.CheckForChatIdAsync(message.Chat.Id);
-            try
+            var userCheck = await CheckForUserInDb(message);
+            var loginStage = "";
+
+            if (userCheck)
             {
-                if (userCheck)
-                {
-                    var response = await _botClient.SendTextMessageAsync(message.Chat.Id, $"Hello, {chatDetails.FirstName}!\nUse /menu to get started",
-                        replyMarkup: new ReplyKeyboardRemove());
-                    return response;
-                }
+                loginStage = "all";
             }
-            catch (Exception exception)
+            if (!await _userRepository.CheckUserExistsAsync(message.Chat.Id))
             {
-                await _errorHandler.HandleErrorAsync(exception);
+                loginStage = "none";
+            }
+            if (await _userRepository.CheckUserExistsAsync(message.Chat.Id) && !await _epumpDataRepository.CheckForChatIdAsync(message.Chat.Id))
+            {
+                loginStage = "telegram";
             }
 
-            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Hello, you are currently not logged in!\nUse /menu to get started.");
+            return (loginStage) switch
+            {
+                "all" => await _botClient.SendTextMessageAsync(message.Chat.Id, $"Hello, {chatDetails.FirstName}!\nUse /menu to get started",
+                    replyMarkup: new ReplyKeyboardRemove()),
+                "none" => await _botClient.SendTextMessageAsync(message.Chat.Id, "Hello, you are currently not logged in!\nUse /menu to get started."),
+                "telegram" => await _botClient.SendTextMessageAsync(message.Chat.Id, "Hello, you are not logged in with Epump\nUse /menu to get started."),
+                _ => await _botClient.SendTextMessageAsync(message.Chat.Id, "Hello, you are currently not logged in!\nUse /menu to get started."),
+            };
         }
+
+        // grey out LogOut for now
+
+        // public async Task<Message> SendLogOutKeyboard(Message message)
+        // {
+        //     await _userRepository.DeleteUser(message.Chat.Id);
+        //     await _epumpDataRepository.DeleteUserAsync(message.Chat.Id);
+        //     return await _botClient.SendTextMessageAsync(message.Chat.Id, "You have been logged out!", replyMarkup: new ReplyKeyboardRemove());
+        // }
 
         public async Task<Message> SendMenu(Message message)
         {
@@ -57,7 +74,11 @@ namespace app.Components
                 {
                     InlineKeyboardButton.WithCallbackData("Login"),
                     InlineKeyboardButton.WithCallbackData("Reports")
-                },
+                }
+                //, new []
+                // {
+                //     InlineKeyboardButton.WithCallbackData("Log Out", "LogOut")
+                // }
             });
             return await _botClient.SendTextMessageAsync(message.Chat.Id, "Welcome to Epump!", replyMarkup: menuKeyboard);
         }
@@ -76,46 +97,62 @@ You can control me with these commands:
 
         public async Task<Message> SendLoginKeyboard(Message message)
         {
+            // Check if user has not authorized with Telegram. 
+            if (!await _userRepository.CheckUserExistsAsync(message.Chat.Id))
+            {
+                await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+
+                loginKeyboard = new(new[]
+                {
+                    new []
+                    {
+                        InlineKeyboardButton.WithUrl("Login", _botConfig.TelegramLoginUrl),
+                    },
+                    new[]
+                    {
+                            InlineKeyboardButton.WithCallbackData("Back", "Menu"),
+                    }
+                });
+
+                return await _botClient.SendTextMessageAsync(message.Chat.Id, "Make a Selection", replyMarkup: loginKeyboard);
+            }
+
+            // Checks if user has authorized with Telegram, but not with Epump.
+            else if (await _userRepository.CheckUserExistsAsync(message.Chat.Id) && !await _epumpDataRepository.CheckForChatIdAsync(message.Chat.Id))
+            {
+                await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+
+                loginKeyboard = new(new[]
+                {
+                    new[]
+                    {
+                        InlineKeyboardButton.WithUrl("Login With Epump", _botConfig.EpumpLoginUrl),
+                    },
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData("Back", "Menu"),
+                    }
+                });
+
+                return await _botClient.SendTextMessageAsync(message.Chat.Id, $"Make a Selection\nNote: Your ChatId is {message.Chat.Id}", replyMarkup: loginKeyboard, parseMode: ParseMode.Markdown);
+            }
+
+            // Else the user must be completely logged in.
+            return await _botClient.SendTextMessageAsync(message.Chat.Id, "You are already logged in!\nUse /menu to get started",
+                    replyMarkup: new ReplyKeyboardRemove());
+        }
+
+        private async Task<bool> CheckForUserInDb(Message message)
+        {
             // user check to prevent multiple logins
-            var userCheck = await _userRepository.CheckUserExistsAsync(message.Chat.Id)
+            return await _userRepository.CheckUserExistsAsync(message.Chat.Id)
             && await _epumpDataRepository.CheckForChatIdAsync(message.Chat.Id);
-            try
-            {
-                // I might need to move this user check logic around
-                // TODO userCheck should cover both DBs
-                if (userCheck)
-                {
-                    await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-                    return await _botClient.SendTextMessageAsync(message.Chat.Id, "You are already logged in!\nUse /menu to get started",
-                        replyMarkup: new ReplyKeyboardRemove());
-                }
-            }
-            catch (Exception exception)
-            {
-                await _errorHandler.HandleErrorAsync(exception);
-            }
-
-            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-
-            InlineKeyboardMarkup loginKeyboard = new(new[]
-            {
-                new []
-                {
-                    InlineKeyboardButton.WithUrl("Login", _botConfig.TelegramLoginUrl),
-                },
-                new []
-                {
-                    InlineKeyboardButton.WithCallbackData("Back","Menu")
-                }
-            });
-            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Login to Epump", replyMarkup: loginKeyboard);
         }
 
         public async Task<Message> SendReportKeyboard(Message message)
         {
             // add check to prevent users who aren't in the Db from accessing this.
-            if (await _userRepository.CheckUserExistsAsync(message.Chat.Id)
-                && await _epumpDataRepository.CheckForChatIdAsync(message.Chat.Id))
+            if (await CheckForUserInDb(message))
             {
                 await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
                 InlineKeyboardMarkup reportKeyboard = new(new[]
