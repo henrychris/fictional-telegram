@@ -237,7 +237,7 @@ Wallet BookBalance: {ParseAsCurrency(result.walletBookBalance)}
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {userData.AuthKey}");
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Sending PDF...");
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Generating PDF...");
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
             var response = await _client.SendAsync(requestMessage);
@@ -256,7 +256,7 @@ Wallet BookBalance: {ParseAsCurrency(result.walletBookBalance)}
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {userData.AuthKey}");
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Sending PDF...");
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Generating PDF...");
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
             var response = await _client.SendAsync(requestMessage);
