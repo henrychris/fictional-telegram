@@ -50,6 +50,7 @@ namespace app.Services
                 "Menu" => _keyboards.SendMenu(callbackQuery.Message),
                 "Login" => _keyboards.SendLoginKeyboard(callbackQuery.Message),
                 "Reports" => _keyboards.SendReportKeyboard(callbackQuery.Message),
+                "DeleteUserData" => _keyboards.DeleteUserData(callbackQuery.Message),
 
                 // Branch Level
                 "BranchReports" => _keyboards.SendBranchReportsKeyboard(callbackQuery.Message),
@@ -109,6 +110,7 @@ namespace app.Services
                 "/menu" => _keyboards.SendMenu(message),
                 "/help" => _keyboards.SendHelp(message),
                 "/reports" => _keyboards.SendReportKeyboard(message),
+                "/delete" => _keyboards.SendConfirmationKeyboard(message),
                 // add Check State to handle tanks filled Report
                 _ => CheckState(message)
             };
