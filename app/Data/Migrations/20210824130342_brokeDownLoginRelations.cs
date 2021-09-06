@@ -29,7 +29,7 @@ namespace app.Data.Migrations
                         column: x => x.EpumpDataId,
                         principalTable: "EpumpData",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
