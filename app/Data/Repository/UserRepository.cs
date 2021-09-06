@@ -146,38 +146,46 @@ namespace app.Data.Repository
 
         public async Task SetUserStateAsync(long chatId, string state)
         {
-            try
+            /*
+                This  function previously failed because the context was disposed prematurely
+                To prevent this, i am using a new instance of the context.
+                It will be disposed automatically.
+            */
+            await using var context = new DataContext();
+
+            var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+            if (user != null)
             {
-                /*
-                    This  function previously failed because the context was disposed prematurely
-                    To prevent this, i am using a new instance of the context.
-                    It will be disposed automatically.
-                */
-                using (var context = new DataContext())
-                {
-                    var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
-                    if (user != null)
-                    {
-                        // user.State.Remove();
-                        user.State = state;
-                        await context.SaveChangesAsync();
-                    }
-                    else
-                    {
-                        await _errorHandler.HandleErrorAsync(new Exception("User not found"));
-                    }
-                }
+                // user.State.Remove();
+                user.State = state;
+                await context.SaveChangesAsync();
             }
-            catch (Exception ex)
+            else
             {
-                await _errorHandler.HandleErrorAsync(ex);
+                await _errorHandler.HandleErrorAsync(new Exception("User not found"));
             }
+
         }
 
         public void Update(AppUser user)
         {
             using (var context = new DataContext())
                 context.Entry(user).State = EntityState.Modified;
+        }
+
+        public async Task DeleteUser(long chatId)
+        {
+            using (var context = new DataContext())
+            {
+                var user = new AppUser { ChatId = chatId };
+                if (user != null)
+                {
+                    context.Users.Attach(user);
+                    context.Users.Remove(user);
+                    await context.SaveChangesAsync();
+                }
+            }
+
         }
     }
 }

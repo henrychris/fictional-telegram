@@ -51,18 +51,23 @@ namespace app.Data.Repository
 
         public async Task<EpumpData> GetUserDetailsAsync(long chatId)
         {
-            // add using statement to avoid disposed context error
-            try
+            await using var context = new DataContext();
+            var userData = await context.EpumpData.AsNoTracking().FirstOrDefaultAsync(x => x.ChatId == chatId);
+            return userData;
+        }
+
+        public async Task DeleteUserAsync(string epumpId)
+        {
+            using (var context = new DataContext())
             {
-                await using var context = new DataContext();
-                var userData = await context.EpumpData.AsNoTracking().FirstOrDefaultAsync(x => x.ChatId == chatId);
-                return userData;
+                var user = new EpumpData { ID = epumpId };
+                if (user != null)
+                {
+                    context.EpumpData.Attach(user);
+                    context.EpumpData.Remove(user);
+                    await context.SaveChangesAsync();
+                }
             }
-            catch (Exception ex)
-            {
-                await _errorHandler.HandleErrorAsync(ex);
-            }
-            return null; // TODO return something else?
         }
     }
 }

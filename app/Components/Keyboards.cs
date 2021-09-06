@@ -56,14 +56,35 @@ namespace app.Components
             };
         }
 
-        // grey out LogOut for now
+        public async Task<Message> SendConfirmationKeyboard(Message message)
+        {
+            
+            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
 
-        // public async Task<Message> SendLogOutKeyboard(Message message)
-        // {
-        //     await _userRepository.DeleteUser(message.Chat.Id);
-        //     await _epumpDataRepository.DeleteUserAsync(message.Chat.Id);
-        //     return await _botClient.SendTextMessageAsync(message.Chat.Id, "You have been logged out!", replyMarkup: new ReplyKeyboardRemove());
-        // }
+            InlineKeyboardMarkup Keyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Delete My Data", "DeleteUserData"),
+                }
+                , new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Back", "Menu")
+                }
+            });
+            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Doing this will PERMANENTLY delete your data.\nYou will have to log back in to use this bot again.", replyMarkup: Keyboard);
+
+        }
+
+        public async Task DeleteUserData(Message message)
+        {
+            await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+
+            await _userRepository.DeleteUser(message.Chat.Id);
+            var user = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
+            await _epumpDataRepository.DeleteUserAsync(user.ID);
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Your data has been deleted successfully", replyMarkup: new ReplyKeyboardRemove());
+        }
 
         public async Task<Message> SendMenu(Message message)
         {
@@ -75,10 +96,6 @@ namespace app.Components
                     InlineKeyboardButton.WithCallbackData("Login"),
                     InlineKeyboardButton.WithCallbackData("Reports")
                 }
-                //, new []
-                // {
-                //     InlineKeyboardButton.WithCallbackData("Log Out", "LogOut")
-                // }
             });
             return await _botClient.SendTextMessageAsync(message.Chat.Id, "Welcome to Epump!", replyMarkup: menuKeyboard);
         }
@@ -90,7 +107,8 @@ namespace app.Components
 You can control me with these commands:
 /start - start/restart me
 /menu - display the menu
-/reports - retrieve a report";
+/reports - retrieve a report
+/delete - permanently delete your data";
 
             return await _botClient.SendTextMessageAsync(message.Chat.Id, response);
         }

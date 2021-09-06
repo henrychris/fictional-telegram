@@ -8,6 +8,7 @@ namespace app.Interfaces
         Task AddUserAsync(EpumpData user);
         Task<bool> CheckUserExistsAsync(string epumpId);
         Task<bool> CheckForChatIdAsync(long chatId);
+        Task DeleteUserAsync(string epumpId);
         Task<EpumpData> GetUserDetailsAsync(long chatId);
         Task<string> GetUserCompanyId(long chatId);
     }
