@@ -35,7 +35,7 @@ namespace app.Middleware
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
                 var response = _env.IsDevelopment()
-                ? new ErrorDetails(context.Response.StatusCode, ex.Message, ex.StackTrace?.ToString())
+                ? new ErrorDetails(context.Response.StatusCode, ex.Message, ex.StackTrace)
                 : new ErrorDetails(context.Response.StatusCode, "Internal Server Error");
 
                 var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
