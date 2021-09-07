@@ -58,8 +58,14 @@ namespace app.Components
 
         public async Task<Message> SendConfirmationKeyboard(Message message)
         {
-            
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+
+            // check if user is logged in
+            var userCheck = await CheckForUserInDb(message);
+            if (!userCheck)
+            {
+                return await _botClient.SendTextMessageAsync(message.Chat.Id, "You are not logged in!\nUse /menu to get started.");
+            }
 
             InlineKeyboardMarkup Keyboard = new(new[]
             {
@@ -132,7 +138,8 @@ You can control me with these commands:
                     }
                 });
 
-                return await _botClient.SendTextMessageAsync(message.Chat.Id, "Make a Selection", replyMarkup: loginKeyboard);
+                return await _botClient.SendTextMessageAsync(message.Chat.Id, $"Make a Selection\n*Note:* Your ChatId is {message.Chat.Id}"
+                    , replyMarkup: loginKeyboard, parseMode: ParseMode.Markdown);
             }
 
             // Checks if user has authorized with Telegram, but not with Epump.
