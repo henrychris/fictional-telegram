@@ -8,13 +8,6 @@ namespace app.Data.Repository
 {
     public class LoginStatusMethods : ILoginStatusRepository
     {
-        private readonly DataContext _context;
-
-        public LoginStatusMethods(DataContext context)
-        {
-            _context = context;
-        }
-
         public async Task AddAsync(LoginStatusTelegram user)
         {
             await using var context = new DataContext();
