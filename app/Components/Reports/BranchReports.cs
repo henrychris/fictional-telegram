@@ -21,8 +21,8 @@ namespace app.Components.Reports
         private readonly IEpumpDataRepository _epumpDataRepository;
         private readonly IUserRepository _userRepository;
         private Stream _pdfReport;
-        private const string DateTimeFormat = "yyyy-MM-dd";
-        private readonly string _endDate = DateTime.Today.ToString("yyyy-MM-dd");
+        private const string DateTimeFormat = "MMMM dd, yyyy";
+        private readonly string _endDate = DateTime.Today.ToString("MMMM dd, yyyy");
 
         public BranchReports(ITelegramBotClient botClient, IHttpClientFactory httpClientFactory, IEpumpDataRepository epumpDataRepository,
         IUserRepository userRepository)
@@ -109,7 +109,7 @@ Succesful Transactions: {result.succesfulAmount}
             var date = ValidateDateInput(message);
             if (date == "Invalid Date")
             {
-                return await _botClient.SendTextMessageAsync(message.Chat.Id, "Please input time in this format: 'Jan 01, 2000'", replyMarkup: new ForceReplyMarkup());
+                return await _botClient.SendTextMessageAsync(message.Chat.Id, "Please input time in this format: 'January 01, 2000'", replyMarkup: new ForceReplyMarkup());
             }
 
             var userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);

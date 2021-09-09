@@ -111,7 +111,7 @@ namespace app.Components.Reports
             // delete last message
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchTanksFilledReport");
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Input time in this format: 'Jan 01, 2000'", replyMarkup: new ForceReplyMarkup());
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Input time in this format: 'January 01, 2000'", replyMarkup: new ForceReplyMarkup());
             return null;
         }
 
@@ -151,14 +151,14 @@ namespace app.Components.Reports
             return null;
         }
 
-        public async Task GetIdForBranchPOSTransactionsReport(Message message)
+        public async Task GetIdForBranchPosTransactionsReport(Message message)
         {
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
             await ShowBranchDataAsKeyboardAsync(message.Chat.Id);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "BranchPOSTransactionsID");
         }
 
-        public async Task<Message> SendBranchPOSTransactionsReportKeyboard(CallbackQuery query, Message message)
+        public async Task<Message> SendBranchPosTransactionsReportKeyboard(CallbackQuery query, Message message)
         {
             await _userRepository.SetCurrentBranchIdAsync(message.Chat.Id, query.Data);
             // delete last message
