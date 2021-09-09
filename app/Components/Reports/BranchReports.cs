@@ -1,15 +1,15 @@
 using System;
+using System.Globalization;
+using System.IO;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
+using app.Components.Summary;
+using app.Entities;
+using app.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using app.Entities;
-using app.Interfaces;
-using app.Components.Summary;
-using System.Text.Json;
-using System.IO;
-using System.Globalization;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace app.Components.Reports
@@ -54,7 +54,7 @@ namespace app.Components.Reports
             var uri = $"EpumpReport/Branch/BranchCashFlowReport?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
 
             var content = await GetReportWithoutSummaryDataAsync(message, uri, userData);
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, $"BranchCashflowReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, "BranchCashflowReport.pdf"));
         }
 
         public async Task<Message> SendBranchSalesTransactionsReportAsync(CallbackQuery query, Message message)
@@ -76,7 +76,7 @@ Total DPK Volume Sold: {content.dpkVolumeSold}
 Total Volume Sold: {content.totalVolumeSold}
 ");
 
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"BranchSalesTransactions.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "BranchSalesTransactions.pdf"));
         }
 
         public async Task<Message> SendBranchTankReportAsync(CallbackQuery query, Message message)
@@ -86,7 +86,7 @@ Total Volume Sold: {content.totalVolumeSold}
             string uri = $"EpumpReport/Branch/TankReport?companyId={userData.CompanyId}&branchId={branchId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
 
             var content = await GetReportWithoutSummaryDataAsync(message, uri, userData);
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, $"BranchTankReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, "BranchTankReport.pdf"));
         }
 
         public async Task<Message> SendBranchPosTransactionsReportAsync(CallbackQuery query, Message message)
@@ -101,7 +101,7 @@ Amount of cashbacks : {result.cashbackAmount}
 Failed Transactions: {result.failedAmount}
 Succesful Transactions: {result.succesfulAmount}
 ");
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"POS Transactions Report.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "POS Transactions Report.pdf"));
         }   
 
         public async Task<Message> SendBranchTanksFilledReportAsync(Message message)
@@ -124,21 +124,12 @@ Volume Discharged(Epump): {result.epumpDischarge}
 Volume Discharged(Manual): {result.manualDischarge}            
 ");
 
-            return await _botClient.SendDocumentAsync(message.Chat.Id, new InputOnlineFile(_pdfReport, $"BranchTanksFilledReport.pdf"));
+            return await _botClient.SendDocumentAsync(message.Chat.Id, new InputOnlineFile(_pdfReport, "BranchTanksFilledReport.pdf"));
         }
 
-        public string ValidateDateInput(Message message)
+        private string ValidateDateInput(Message message)
         {
-            DateTime date;
-
-            if (DateTime.TryParseExact(message.Text, DateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
-            {
-                return date.ToString(DateTimeFormat);
-            }
-            else
-            {
-                return "Invalid Date";
-            }
+            return DateTime.TryParseExact(message.Text, DateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) ? date.ToString(DateTimeFormat) : "Invalid Date";
         }
 
         public async Task<Message> SendBranchVarianceReportAsync(CallbackQuery query, Message message)
@@ -154,7 +145,7 @@ Total Volume Sold(Manual): {content.totalManualVolumeSold}
 Variance: {content.totalVariance}
 ");
 
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"BranchVarianceReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "BranchVarianceReport.pdf"));
         }
 
         public async Task<Message> SendProductSummaryReportAsync(CallbackQuery query, Message message)
@@ -176,7 +167,7 @@ DPK Volume Sold: {content.dpkVolumeSold}
 Total Volume Sold: {content.totalVolumeSold}
 ");
 
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"ProductSummaryReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "ProductSummaryReport.pdf"));
         }
 
         private async Task<SummaryData> GetReportWithSummaryDataAsync(Message message, string uri, EpumpData userData)
@@ -193,6 +184,7 @@ Total Volume Sold: {content.totalVolumeSold}
             var content = await response.Content.ReadAsStreamAsync();
             var result = await JsonSerializer.DeserializeAsync<SummaryData>(content);
 
+            // TODO add handler for null reference exception
             _pdfReport = new MemoryStream(result.pdfReport);
             return result;
         }
