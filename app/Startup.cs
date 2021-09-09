@@ -18,6 +18,7 @@ using app.Data.Repository;
 using app.Interfaces;
 using app.Middleware;
 using app.Services;
+using app.Controllers.Helper;
 
 namespace app
 {
@@ -28,7 +29,9 @@ namespace app
         public static void AddComponents(this IServiceCollection services)
         {
             services.AddTransient<Keyboards>();
+            services.AddTransient<EpumpLogin>();
             services.AddScoped<ErrorHandler>();
+            services.AddTransient<BotControllerHelper>();
 
             services.AddTransient<BranchReportsKeyboards>();
             services.AddTransient<BranchReports>();
