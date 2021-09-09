@@ -30,7 +30,7 @@ namespace app.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error in ExceptionMiddleware: {ex.Message}");
+                _logger.LogError(ex, $"Error in ExceptionMiddleware: {ex.Message}\n{ex.StackTrace}");
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
