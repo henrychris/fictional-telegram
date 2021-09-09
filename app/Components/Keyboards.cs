@@ -11,19 +11,17 @@ namespace app.Components
     public class Keyboards
     {
         private readonly ITelegramBotClient _botClient;
-        private readonly ErrorHandler _errorHandler;
         private readonly IUserRepository _userRepository;
         private readonly BotConfiguration _botConfig;
         private readonly IEpumpDataRepository _epumpDataRepository;
-        InlineKeyboardMarkup loginKeyboard;
+        private InlineKeyboardMarkup _loginKeyboard;
 
-        public Keyboards(ITelegramBotClient botClient, ErrorHandler errorHandler,
+        public Keyboards(ITelegramBotClient botClient,
         IUserRepository userRepository, IConfiguration configuration,
         IEpumpDataRepository epumpDataRepository)
         {
             _epumpDataRepository = epumpDataRepository;
             _userRepository = userRepository;
-            _errorHandler = errorHandler;
             _botClient = botClient;
             _botConfig = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
         }
@@ -67,7 +65,7 @@ namespace app.Components
                 return await _botClient.SendTextMessageAsync(message.Chat.Id, "You are not logged in!\nUse /menu to get started.");
             }
 
-            InlineKeyboardMarkup Keyboard = new(new[]
+            InlineKeyboardMarkup keyboard = new(new[]
             {
                 new []
                 {
@@ -78,7 +76,7 @@ namespace app.Components
                     InlineKeyboardButton.WithCallbackData("Back", "Menu")
                 }
             });
-            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Doing this will PERMANENTLY delete your data.\nYou will have to log back in to use this bot again.", replyMarkup: Keyboard);
+            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Doing this will PERMANENTLY delete your data.\nYou will have to log back in to use this bot again.", replyMarkup: keyboard);
 
         }
 
@@ -126,7 +124,7 @@ You can control me with these commands:
             {
                 await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
 
-                loginKeyboard = new(new[]
+                _loginKeyboard = new(new[]
                 {
                     new []
                     {
@@ -139,7 +137,7 @@ You can control me with these commands:
                 });
 
                 return await _botClient.SendTextMessageAsync(message.Chat.Id, $"Make a Selection\n*Note:* Your ChatId is {message.Chat.Id}"
-                    , replyMarkup: loginKeyboard, parseMode: ParseMode.Markdown);
+                    , replyMarkup: _loginKeyboard, parseMode: ParseMode.Markdown);
             }
 
             // Checks if user has authorized with Telegram, but not with Epump.
@@ -147,11 +145,11 @@ You can control me with these commands:
             {
                 await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
 
-                loginKeyboard = new(new[]
+                _loginKeyboard = new(new[]
                 {
                     new[]
                     {
-                        InlineKeyboardButton.WithUrl("Login With Epump", _botConfig.EpumpLoginUrl),
+                        InlineKeyboardButton.WithCallbackData("Login With Epump", "EpumpLogin"),
                     },
                     new[]
                     {
@@ -159,7 +157,7 @@ You can control me with these commands:
                     }
                 });
 
-                return await _botClient.SendTextMessageAsync(message.Chat.Id, $"Make a Selection\nNote: Your ChatId is {message.Chat.Id}", replyMarkup: loginKeyboard, parseMode: ParseMode.Markdown);
+                return await _botClient.SendTextMessageAsync(message.Chat.Id, $"Make a Selection\nNote: Your ChatId is {message.Chat.Id}", replyMarkup: _loginKeyboard, parseMode: ParseMode.Markdown);
             }
 
             // Else the user must be completely logged in.
