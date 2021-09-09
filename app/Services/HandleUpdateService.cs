@@ -102,6 +102,7 @@ namespace app.Services
             var action = (message.Text.Split(' ').First()) switch
             {
                 "/start" => _keyboards.Start(message),
+                "/login" => _keyboards.SendLoginKeyboard(message),
                 "/menu" => _keyboards.SendMenu(message),
                 "/help" => _keyboards.SendHelp(message),
                 "/reports" => _keyboards.SendReportKeyboard(message),
