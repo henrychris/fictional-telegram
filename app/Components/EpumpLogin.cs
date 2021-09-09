@@ -81,7 +81,7 @@ namespace app.Components
 
             if (isValidOtp)
                 return await _botClient.SendTextMessageAsync(message.Chat.Id,
-                    "Success!\nWelcome to Epump. Use /menu to get started");
+                    "Success!\nWelcome to Epump. \nUse /menu to get started");
 
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
             return await _botClient.SendTextMessageAsync(message.Chat.Id, "An error occurred.");
