@@ -1,15 +1,15 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.InputFiles;
 using app.Components.Summary;
 using app.Entities;
 using app.Interfaces;
-using System.Globalization;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace app.Components.Reports
@@ -53,7 +53,7 @@ namespace app.Components.Reports
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, $"Summary\nYou sold:\nPMS:{result.pmsAmount}\nAGO: {result.agoAmount}\nDPK: {result.dpkAmount}\nTotal: {result.totalAmount}");
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"CompanyBranchSalesReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyBranchSalesReport.pdf"));
         }
 
         public async Task<Message> SendCompanyCashflowReportAsync(CallbackQuery query, Message message)
@@ -63,7 +63,7 @@ namespace app.Components.Reports
             var uri = $"EpumpReport/Company/CompanyCashflowReport?companyId={_userData.CompanyId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
             var content = await GetReportWithoutSummaryDataAsync(message, uri, _userData);
 
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, $"CompanyCashFlowReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, "CompanyCashFlowReport.pdf"));
         }
 
         public async Task<Message> SendCompanyExpenseCategoriesReportAsync(CallbackQuery query, Message message)
@@ -72,7 +72,7 @@ namespace app.Components.Reports
 
             var uri = $"EpumpReport/Company/Management/ExpenseCategoriesReport?companyId={_userData.CompanyId}";
             var content = await GetReportWithoutSummaryDataAsync(message, uri, _userData);
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, $"CompanyExpenseCategoriesReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, "CompanyExpenseCategoriesReport.pdf"));
         }
 
         public async Task<Message> SendCompanyOutstandingPaymentsReportAsync(CallbackQuery query, Message message)
@@ -85,7 +85,7 @@ namespace app.Components.Reports
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 Outstanding Amount: {result.outstandingAmount}");
 
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"CompanyOutstandingPaymentsReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyOutstandingPaymentsReport.pdf"));
         }
 
         public async Task<Message> SendCompanyRetainershipReportAsync(CallbackQuery query, Message message)
@@ -94,7 +94,7 @@ Outstanding Amount: {result.outstandingAmount}");
             var uri = $"EpumpReport/Company/Retainerships/RetainershipReport?companyId={_userData.CompanyId}";
 
             var content = await GetReportWithoutSummaryDataAsync(message, uri, _userData);
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, $"CompanyRetainershipReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, "CompanyRetainershipReport.pdf"));
         }
 
         public async Task<Message> SendCompanySalesSummaryReportAsync(CallbackQuery query, Message message)
@@ -114,7 +114,7 @@ AGO Pump Sales: {result.agoPumpSale}
 DPK Pump Sales: {result.dpkPumpSale}
 Total Sales: {result.totalAmount}
 ");
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"CompanySalesSummaryReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanySalesSummaryReport.pdf"));
         }
 
         public async Task<Message> SendCompanyTankStockReportAsync(CallbackQuery query, Message message)
@@ -130,7 +130,7 @@ AGO Volume: {result.agoVolume}
 LPG Volume: {result.dpkVolume}
 DPK Volume: {result.lpgVolume}
 ");
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"CompanyTankStockReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyTankStockReport.pdf"));
         }
 
         public async Task<Message> SendCompanyTanksFilledReportAsync(Message message)
@@ -138,7 +138,7 @@ DPK Volume: {result.lpgVolume}
             var date = ValidateDateInput(message);
             if (date == "Invalid Date")
             {
-                return await _botClient.SendTextMessageAsync(message.Chat.Id, "Please input time in this format: 'Jan 01, 2000'", replyMarkup: new ForceReplyMarkup());
+                return await _botClient.SendTextMessageAsync(message.Chat.Id, "Please input time in this format: 'January 01, 2000'", replyMarkup: new ForceReplyMarkup());
             }
 
             _userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
@@ -151,7 +151,7 @@ Volume Discharged(Epump): {result.epumpDischarge}
 Volume Discharged(Manual): {result.manualDischarge}
 ");
 
-            return await _botClient.SendDocumentAsync(message.Chat.Id, new InputOnlineFile(_pdfReport, $"CompanyTanksFilledReport.pdf"));
+            return await _botClient.SendDocumentAsync(message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyTanksFilledReport.pdf"));
         }
 
         private static string ValidateDateInput(Message message)
@@ -172,7 +172,7 @@ Volume Discharged(Manual): {result.manualDischarge}
 Total Volume Sold(Epump): {result.totalEpumpVolumeSold}
 Total Volume Sold(Manual): {result.totalManualVolumeSold}
 Variance: {result.totalVariance}");
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"CompanyVarianceReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyVarianceReport.pdf"));
         }
 
         public async Task<Message> SendCompanyWalletFundRequestReportAsync(CallbackQuery query, Message message)
@@ -190,7 +190,7 @@ Variance: {result.totalVariance}");
                 Console.WriteLine(e.Message);
             }
 
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"WalletFundRequest.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "WalletFundRequest.pdf"));
         }
 
         public async Task<Message> SendCompanyPosTransactionsReportAsync(CallbackQuery query, Message message)
@@ -204,7 +204,7 @@ Amount of cashbacks : {result.cashbackAmount}
 Failed Transactions: {result.failedAmount}
 Succesful Transactions: {result.succesfulAmount}
 ");
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"Pos Transactions Report.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "Pos Transactions Report.pdf"));
         }
 
         public async Task<Message> SendCompanyWalletReportAsync(CallbackQuery query, Message message)
@@ -218,7 +218,7 @@ Succesful Transactions: {result.succesfulAmount}
 Wallet Balance: {ParseAsCurrency(result.walletBalance)}
 Wallet BookBalance: {ParseAsCurrency(result.walletBookBalance)}
 ");
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, $"CompanyWalletReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyWalletReport.pdf"));
         }
 
         public async Task<Message> SendCompanyZonesReportAsync(CallbackQuery query, Message message)
@@ -228,7 +228,7 @@ Wallet BookBalance: {ParseAsCurrency(result.walletBookBalance)}
 
             var uri = $"EpumpReport/Company/Management/ZonesReport?companyId={_userData.CompanyId}";
             var content = await GetReportWithoutSummaryDataAsync(message, uri, _userData);
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, $"CompanyZonesReport.pdf"));
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, "CompanyZonesReport.pdf"));
         }
 
         private async Task<SummaryData> GetReportWithSummaryDataAsync(Message message, string uri, EpumpData userData)
