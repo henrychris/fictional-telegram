@@ -9,49 +9,30 @@ namespace app.Data.Repository
 {
     public class UserRepository : DbContext, IUserRepository
     {
-        private readonly DataContext _context;
         private readonly ErrorHandler _errorHandler;
-        public UserRepository(DataContext context, ErrorHandler errorHandler)
+        public UserRepository(ErrorHandler errorHandler)
         {
-            // TODO check if the DI works properly
             _errorHandler = errorHandler;
-            _context = context;
         }
-
-        // ! where AsNoTracking is Enabled, values can only be read.
-        // ! and db would not be updated.
 
         public async Task AddUserAsync(AppUser user)
         {
-            using (var context = new DataContext())
-            {
-                await context.Users.AddAsync(user);
-                await context.SaveChangesAsync();
-            }
+            await using var context = new DataContext();
+            await context.Users.AddAsync(user);
+            await context.SaveChangesAsync();
         }
 
         public async Task<bool> CheckUserExistsAsync(long chatId)
         {
             // ! Investigate the reason for the invalid operation exception.
-            using (var context = new DataContext())
-                try
-                {
-                    return await context.Users.AsNoTracking().AnyAsync(u => u.ChatId == chatId);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            return false;
+            await using var context = new DataContext();
+            return await context.Users.AsNoTracking().AnyAsync(u => u.ChatId == chatId);
         }
 
         public async Task<bool> CheckForEpumpIdAsync(string id)
         {
-            using (var context = new DataContext())
-            {
-                return await context.Users.AsNoTracking().AnyAsync(u => u.EpumpDataId == id);
-            }
-
+            await using var context = new DataContext();
+            return await context.Users.AsNoTracking().AnyAsync(u => u.EpumpDataId == id);
         }
 
         public async Task FindAndUpdateUserWithEpumpDataAsync(long chatId, string epumpId)
@@ -68,68 +49,55 @@ namespace app.Data.Repository
 
         public async Task<string> GetCurrentBranchIdAsync(long chatId)
         {
-            AppUser user = null;
             await using var context = new DataContext();
-            try
-            {
-                user = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
-            }
-            catch (Exception e)
-            {
-                System.Console.WriteLine(e.Message);
-            }
 
-            // Whenever there is a null value, it shall return null
+            var user = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
             return user?.CurrentBranch;
         }
 
         public async Task<AppUser> GetUserByIdAndUserNameAsync(long chatId, string username)
         {
-            using (var context = new DataContext())
-                return await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId && u.Username == username);
+            await using var context = new DataContext();
+            return await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId && u.Username == username);
         }
 
         public async Task<AppUser> GetUserByIdAsync(long chatId)
         {
-            using (var context = new DataContext())
-                return await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
+            await using var context = new DataContext();
+            return await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
         }
 
         public async Task<AppUser> GetUserByUserNameAsync(string username)
         {
-            using (var context = new DataContext())
-                return await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
+            await using var context = new DataContext();
+            return await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
         }
 
         public async Task<string> GetUserStateAsync(long chatId)
         {
-            using (var context = new DataContext())
-            {
-                var user = await context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.ChatId == chatId);
-                return user.State;
-            }
+            await using var context = new DataContext();
+            var user = await context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.ChatId == chatId);
+            return user.State;
         }
 
         public async Task<bool> SaveAllChangesAsync(AppUser user)
         {
-            using (var context = new DataContext())
-                return await context.SaveChangesAsync() > 0;
+            await using var context = new DataContext();
+            return await context.SaveChangesAsync() > 0;
         }
 
         public async Task SetCurrentBranchIdAsync(long chatId, string branchId)
         {
-            using (var context = new DataContext())
+            await using var context = new DataContext();
+            var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+            if (user != null)
             {
-                var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
-                if (user != null)
-                {
-                    user.CurrentBranch = branchId;
-                    await context.SaveChangesAsync();
-                }
-                else
-                {
-                    await _errorHandler.HandleErrorAsync(new Exception("User not found"));
-                }
+                user.CurrentBranch = branchId;
+                await context.SaveChangesAsync();
+            }
+            else
+            {
+                await _errorHandler.HandleErrorAsync(new Exception("User not found"));
             }
         }
 
@@ -169,23 +137,33 @@ namespace app.Data.Repository
 
         public void Update(AppUser user)
         {
-            using (var context = new DataContext())
-                context.Entry(user).State = EntityState.Modified;
+            using var context = new DataContext();
+            context.Entry(user).State = EntityState.Modified;
         }
 
         public async Task DeleteUser(long chatId)
         {
-            using (var context = new DataContext())
-            {
-                var user = new AppUser { ChatId = chatId };
-                if (user != null)
-                {
-                    context.Users.Attach(user);
-                    context.Users.Remove(user);
-                    await context.SaveChangesAsync();
-                }
-            }
+            await using var context = new DataContext();
+            var user = new AppUser { ChatId = chatId };
+            context.Users.Attach(user);
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
+        }
 
+        public async Task SetUserEmail(long chatId, string email)
+        {
+            await using var context = new DataContext();
+            var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+            user.Email = email;
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<string> GetUserEmail(long chatId)
+        {
+            await using var context = new DataContext();
+            var user = await context.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+            var email = user.Email;
+            return email;
         }
     }
 }

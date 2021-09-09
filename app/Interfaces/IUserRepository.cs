@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using app.Entities;
 
@@ -21,5 +20,8 @@ namespace app.Interfaces
         Task SetCurrentBranchIdToNull(long chatId);
         void Update(AppUser user);
         Task FindAndUpdateUserWithEpumpDataAsync(long chatId, string epumpId);
+
+        Task SetUserEmail(long chatId, string email);
+        Task<string> GetUserEmail(long chatId);
     }
 }
