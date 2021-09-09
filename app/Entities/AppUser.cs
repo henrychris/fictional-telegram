@@ -14,6 +14,7 @@ namespace app.Entities
         public string Hash { get; set; }
         public string State { get; set; }
         public string CurrentBranch { get; set; }
+        public string Email { get; set; }
 
         public string EpumpDataId { get; set; }
         public virtual EpumpData EpumpData { get; set; }
