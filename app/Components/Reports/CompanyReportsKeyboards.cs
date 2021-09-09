@@ -76,7 +76,7 @@ namespace app.Components.Reports
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
             await _userRepository.SetUserStateAsync(message.Chat.Id, "CompanyTanksFilledReport");
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Input time in this format: 'Jan 01, 2000'", replyMarkup: new ForceReplyMarkup());
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Input time in this format: 'January 01, 2000'", replyMarkup: new ForceReplyMarkup());
             return null;
         }
 

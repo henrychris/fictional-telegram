@@ -22,17 +22,19 @@ namespace app.Services
         private readonly BranchReports _branchReports;
         private readonly CompanyReports _companyReports;
         private readonly CompanyReportsKeyboards _companyReportsKeyboards;
+        private readonly EpumpLogin _epumpLogin;
 
         public HandleUpdateService(ITelegramBotClient botClient, ILoggerManager logger,
         Keyboards keyboards, ErrorHandler errorHandler, BranchReportsKeyboards branchReportsKeyboards,
         IUserRepository userRepository, BranchReports branchReports, CompanyReports companyReports,
-        CompanyReportsKeyboards companyReportsKeyboards
+        CompanyReportsKeyboards companyReportsKeyboards, EpumpLogin epumpLogin
         )
 
         {
             _branchReports = branchReports;
             _companyReports = companyReports;
             _companyReportsKeyboards = companyReportsKeyboards;
+            _epumpLogin = epumpLogin;
             _userRepository = userRepository;
             _branchReportsKeyboards = branchReportsKeyboards;
             _errorHandler = errorHandler;
@@ -52,6 +54,8 @@ namespace app.Services
                 "Reports" => _keyboards.SendReportKeyboard(callbackQuery.Message),
                 "DeleteUserData" => _keyboards.DeleteUserData(callbackQuery.Message),
 
+                "EpumpLogin" => _epumpLogin.SendEpumpLoginKeyboard(callbackQuery.Message),
+
                 // Branch Level
                 "BranchReports" => _keyboards.SendBranchReportsKeyboard(callbackQuery.Message),
 
@@ -66,7 +70,7 @@ namespace app.Services
                 "Tanks Filled" => _branchReportsKeyboards.GetIdForBranchTanksFilledReport(callbackQuery.Message),
                 "Variance" => _branchReportsKeyboards.GetIdForBranchVarianceReport(callbackQuery.Message),
                 "Tank Report" => _branchReportsKeyboards.GetIdForBranchTankReport(callbackQuery.Message),
-                "Branch POS Transactions" => _branchReportsKeyboards.GetIdForBranchPOSTransactionsReport(callbackQuery.Message),
+                "Branch POS Transactions" => _branchReportsKeyboards.GetIdForBranchPosTransactionsReport(callbackQuery.Message),
 
                 // Company Reports
                 "Branch Sales" => _companyReportsKeyboards.SendCompanyBranchSalesReportKeyboard(callbackQuery.Message),
@@ -87,21 +91,12 @@ namespace app.Services
                 // this needs a status
                 "Wallet Fund Request" => _companyReportsKeyboards.SendCompanyWalletFundRequestReportKeyboard(callbackQuery.Message),
 
-                // responding to an unknown command
-                // _ => UnknownCommand(callbackQuery.Message),
-
                 _ => CheckState(callbackQuery)
             };
         }
 
         public async Task BotOnMessageReceived(Message message)
         {
-            // TODO add check for messages sent while Bot was offline
-            // maybe convert from unix time first?
-            // ! The ngrok server does not receive data until the webhook is set.
-            // ! So, the bot will not receive any messages until the webhook is set.
-            // ? How do I ignore old messages?
-            // ? subtract  five seconds from each message? or ten
             if ((message.Date.ToLocalTime() < ServerStart)) return;
 
             var action = (message.Text.Split(' ').First()) switch
@@ -111,7 +106,8 @@ namespace app.Services
                 "/help" => _keyboards.SendHelp(message),
                 "/reports" => _keyboards.SendReportKeyboard(message),
                 "/delete" => _keyboards.SendConfirmationKeyboard(message),
-                // add Check State to handle tanks filled Report
+
+                // Manages reports with unique inputs
                 _ => CheckState(message)
             };
 
@@ -159,18 +155,19 @@ namespace app.Services
 
         private async Task<Message> CheckState(Message message)
         {
-            Message response = null;
             var userState = await _userRepository.GetUserStateAsync(message.Chat.Id);
             if (userState == null)
             {
                 return await UnknownCommand(message);
             }
 
-            response = userState switch
+            var response = userState switch
             {
                 // The report will be sent from here.
                 "BranchTanksFilledReport" => await _branchReports.SendBranchTanksFilledReportAsync(message),
                 "CompanyTanksFilledReport" => await _companyReports.SendCompanyTanksFilledReportAsync(message),
+                "EpumpLogin_InputEmail" => await _epumpLogin.PromptUserForOtp(message),
+                "EpumpLogin_ValidateOTP" => await _epumpLogin.ReceiveOtpFromUserInput(message),
                 _ => await UnknownCommand(message)
             };
             return response;
@@ -226,7 +223,7 @@ namespace app.Services
                     response = await _branchReportsKeyboards.SendBranchTankReportKeyboard(query, query.Message);
                     break;
                 case "BranchPOSTransactionsID":
-                    response = await _branchReportsKeyboards.SendBranchPOSTransactionsReportKeyboard(query, query.Message);
+                    response = await _branchReportsKeyboards.SendBranchPosTransactionsReportKeyboard(query, query.Message);
                     break;
                 case "BranchPOSTransactions":
                     response = await _branchReports.SendBranchPosTransactionsReportAsync(query, query.Message);

@@ -7,6 +7,7 @@ namespace app.Entities
         public string CompanyId { get; set; }
         public string AuthKey { get; set; }
         public string Role { get; set; }
+        public string Email { get; set; }
         public virtual AppUser User { get; set; }
     }
 }

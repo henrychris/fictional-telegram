@@ -1,5 +1,3 @@
-using System;
-
 namespace app.Entities
 {
     public class CompanyBranchInfo

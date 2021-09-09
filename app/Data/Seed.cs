@@ -4,12 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Linq;
-// using Newtonsoft.Json;
 
 namespace app.Data
 {
-    public class Seed
+    public static class Seed
     {
         public static async Task SeedDataBase(DataContext context)
         {
@@ -23,7 +21,7 @@ namespace app.Data
             await context.SaveChangesAsync();
         }
 
-        public static async Task SeedUsers(DataContext context)
+        private static async Task SeedUsers(DataContext context)
         {
             var userData = await File.ReadAllTextAsync("Data/UserSeed.json");
             var users = JsonSerializer.Deserialize<List<AppUser>>(userData);
@@ -36,28 +34,27 @@ namespace app.Data
             await context.SaveChangesAsync();
         }
 
-        public static async Task SeedEpumpData(DataContext context)
+        private static async Task SeedEpumpData(DataContext context)
         {
             var epumpData = await File.ReadAllTextAsync("Data/EpumpDataSeed.json");
             var epumpDataList = JsonSerializer.Deserialize<List<EpumpData>>(epumpData);
 
             // create epump data of class EpumpData
-            for (int i = 0; i < epumpDataList.Count; i++)
+            foreach (var item in epumpDataList)
             {
-                EpumpData item = epumpDataList[i];
                 await context.EpumpData.AddAsync(item);
 
                 // Update the user table with the epump FK
-                var check = await context.Users.AnyAsync(u => u.ChatId == item.ChatId);
-                if (check)
-                {
-                    var userToUpdate = await context.Users.FirstOrDefaultAsync(x => x.ChatId == item.ChatId);
-                    userToUpdate.EpumpDataId = item.ID;
-                }
+                var user = item;
+                var check = await context.Users.AnyAsync(u => u.ChatId == user.ChatId);
+
+                if (!check) continue;
+                var userToUpdate = await context.Users.FirstOrDefaultAsync(x => x.ChatId == item.ChatId);
+                userToUpdate.EpumpDataId = item.ID;
             }
         }
 
-        public static async Task SeedLoginData(DataContext context)
+        private static async Task SeedLoginData(DataContext context)
         {
             var loginData = await File.ReadAllTextAsync("Data/TelegramLogin.json");
             var loginStatusList = JsonSerializer.Deserialize<List<LoginStatusTelegram>>(loginData);
@@ -69,10 +66,10 @@ namespace app.Data
             }
 
             var loginData2 = await File.ReadAllTextAsync("Data/EpumpLogin.json");
-            var loginStatusList2 = JsonSerializer.Deserialize<List<LoginStatusEpump>>(loginData2);
+            var EpumpLoginStatusList = JsonSerializer.Deserialize<List<LoginStatusEpump>>(loginData2);
 
             // create login status of class LoginStatus
-            foreach (var item in loginStatusList2)
+            foreach (var item in EpumpLoginStatusList)
             {
                 await context.loginStatusEpump.AddAsync(item);
             }

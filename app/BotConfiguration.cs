@@ -9,6 +9,7 @@ namespace app
         public string EpumpLoginUrl { get; init; }
         public string EpumpReportUri { get; init; }
         public string EpumpApiUri { get; init; }
+        public string AdminToken { get; init; }
 
     }
 }

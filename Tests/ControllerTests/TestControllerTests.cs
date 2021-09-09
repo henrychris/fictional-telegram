@@ -46,14 +46,14 @@ namespace Tests.ControllerTests
         public async Task GetIsLoggedIn_GivenChatAndEpumpId_ReturnsOkResult()
         {
             _loginStatusMock.Setup(t => t.IsUserLoggedInAsync(It.Is<long>(i => i == 926122532), It.Is<string>(i => i == "1")))
-               .ReturnsAsync(true);
+            .ReturnsAsync(true);
 
-           // Test Controller function `GetUserLoggedIn` calls the loginStatusRepo function `IsUserLoggedIn`.
-           // By mocking it such that it checks params for the values that would be in the db
-           // I can test if a certain user is logged in.
+            // Test Controller function `GetUserLoggedIn` calls the loginStatusRepo function `IsUserLoggedIn`.
+            // By mocking it such that it checks params for the values that would be in the db
+            // I can test if a certain user is logged in.
 
-           var result = await _testController.GetIsLoggedIn(926122532, "1");
-           Assert.IsType<OkResult>(result);
+            var result = await _testController.GetIsLoggedIn(926122532, "1");
+            Assert.IsType<OkResult>(result);
         }
 
         [Fact]
