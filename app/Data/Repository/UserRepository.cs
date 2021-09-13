@@ -28,13 +28,6 @@ namespace app.Data.Repository
             await using var context = new DataContext();
             return await context.Users.AsNoTracking().AnyAsync(u => u.ChatId == chatId);
         }
-
-        public async Task<bool> CheckForEpumpIdAsync(string id)
-        {
-            await using var context = new DataContext();
-            return await context.Users.AsNoTracking().AnyAsync(u => u.EpumpDataId == id);
-        }
-
         public async Task FindAndUpdateUserWithEpumpDataAsync(long chatId, string epumpId)
         {
             await using var context = new DataContext();
@@ -55,31 +48,13 @@ namespace app.Data.Repository
             return user?.CurrentBranch;
         }
 
-        public async Task<AppUser> GetUserByIdAndUserNameAsync(long chatId, string username)
-        {
-            await using var context = new DataContext();
-            return await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId && u.Username == username);
-        }
-
-        public async Task<AppUser> GetUserByIdAsync(long chatId)
-        {
-            await using var context = new DataContext();
-            return await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
-        }
-
-        public async Task<AppUser> GetUserByUserNameAsync(string username)
-        {
-            await using var context = new DataContext();
-            return await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
-        }
-
         public async Task<string> GetUserStateAsync(long chatId)
         {
             await using var context = new DataContext();
             var user = await context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.ChatId == chatId);
             return user.State;
         }
-
+        
         public async Task<bool> SaveAllChangesAsync(AppUser user)
         {
             await using var context = new DataContext();

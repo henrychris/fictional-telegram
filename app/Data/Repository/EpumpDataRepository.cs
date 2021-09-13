@@ -14,25 +14,11 @@ namespace app.Data.Repository
             await context.SaveChangesAsync();
         }
 
-        public async Task<bool> CheckUserExistsAsync(string epumpId)
-        {
-            await using var context = new DataContext();
-            return await context.EpumpData.AsNoTracking().AnyAsync(e => e.ID == epumpId);
-        }
-
         public async Task<bool> CheckForChatIdAsync(long chatId)
         {
             await using var context = new DataContext();
             return await context.EpumpData.AsNoTracking().AnyAsync(e => e.ChatId == chatId);
         }
-
-        public async Task<string> GetUserCompanyId(long chatId)
-        {
-            await using var context = new DataContext();
-            var user = await context.EpumpData.AsNoTracking().FirstOrDefaultAsync(u => u.ChatId == chatId);
-            return user?.CompanyId;
-        }
-
         public async Task<EpumpData> GetUserDetailsAsync(long chatId)
         {
             await using var context = new DataContext();

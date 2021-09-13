@@ -42,21 +42,5 @@ namespace app.Data.Repository
             await using var context = new DataContext();
             return await context.loginStatusTelegram.AnyAsync(u => u.UserChatId == chatId);
         }
-
-        public async Task SetEpumpLoginStatusAsync(string epumpId, DateTime dateTime, bool status)
-        {
-            await using var context = new DataContext();
-            var epumpUser = await context.loginStatusEpump.FirstOrDefaultAsync(u => u.EpumpDataId == epumpId);
-            epumpUser.IsLoggedIn = status;
-            await context.SaveChangesAsync();
-        }
-
-        public async Task SetTelegramLoginStatusAsync(long chatId, DateTime dateTime, bool status)
-        {
-            await using var context = new DataContext();
-            var telegramUser = await context.loginStatusTelegram.FirstOrDefaultAsync(u => u.UserChatId == chatId);
-            telegramUser.IsLoggedIn = status;
-            await context.SaveChangesAsync();
-        }
     }
 }

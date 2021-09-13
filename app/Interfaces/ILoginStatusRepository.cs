@@ -11,8 +11,5 @@ namespace app.Interfaces
         Task<bool> IsUserLoggedInAsync(long chatId, string epumpId);
         Task<bool> IsUserLoggedInAsync_Epump(string epumpId);
         Task<bool> IsUserLoggedInAsync_Telegram(long chatId);
-        Task SetEpumpLoginStatusAsync(string epumpId, DateTime dateTime, bool status);
-        Task SetTelegramLoginStatusAsync(long chatId, DateTime dateTime, bool status);
-
     }
 }
