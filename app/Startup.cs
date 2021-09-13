@@ -161,7 +161,6 @@ namespace app
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IEpumpDataRepository, EpumpDataRepository>();
-            services.AddScoped<ILoginStatusRepository, LoginStatusMethods>();
 
             services.ConfigureLoggerService();
             services.ConfigureAutoMapper();

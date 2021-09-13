@@ -8,8 +8,5 @@ namespace app.Controllers.Interfaces
         IActionResult GetBadRequest();
         IActionResult GetNotFound();
         IActionResult GetServerError();
-        Task<IActionResult> GetIsLoggedIn(long chatId, string epumpId);
-        Task<IActionResult> GetIsLoggedInTelegram(long chatId);
-        Task<IActionResult> GetIsLoggedInEpump(string epumpId);
     }
 }

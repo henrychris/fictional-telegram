@@ -34,5 +34,11 @@ namespace app.Data.Repository
             context.EpumpData.Remove(user);
             await context.SaveChangesAsync();
         }
+
+        public async Task<bool> CheckUserExistsAsync(string Id)
+        {
+            await using var context = new DataContext();
+            return await context.EpumpData.AsNoTracking().AnyAsync(x=> x.ID == Id);
+        }  
     }
 }

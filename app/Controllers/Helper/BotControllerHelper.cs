@@ -15,11 +15,10 @@ namespace app.Controllers.Helper
         private readonly ILoggerManager _logger;
         private readonly IUserRepository _userRepository;
         private readonly IEpumpDataRepository _epumpDataRepository;
-        private readonly ILoginStatusRepository _loginStatusRepository;
-        public BotControllerHelper(IMapper mapper, ILoggerManager logger, IUserRepository userRepository, IEpumpDataRepository epumpDataRepository,
-        ILoginStatusRepository loginStatusRepository)
+        
+        public BotControllerHelper(IMapper mapper, ILoggerManager logger, IUserRepository userRepository,
+        IEpumpDataRepository epumpDataRepository)
         {
-            _loginStatusRepository = loginStatusRepository;
             _epumpDataRepository = epumpDataRepository;
             _userRepository = userRepository;
             _logger = logger;
@@ -32,20 +31,14 @@ namespace app.Controllers.Helper
 
             var user = _mapper.Map<AppUser>(data);
 
-            if (await _loginStatusRepository.IsUserLoggedInAsync_Telegram(user.ChatId))
+            // if (await _loginStatusRepository.IsUserLoggedInAsync_Telegram(user.ChatId))
+            if (await _userRepository.CheckUserExistsAsync(data.id))
             {
                 return BadRequest("User already exists");
             }
             else
             {
                 await _userRepository.AddUserAsync(user);
-                await _loginStatusRepository.AddAsync(new LoginStatusTelegram
-                {
-                    UserChatId = user.ChatId,
-                    LoginDate = DateTime.Now,
-                    IsLoggedIn = true
-                });
-
                 _logger.LogInfo($"User {user.FirstName} with ID {user.ChatId} has been added to the database, at {DateTime.Now}");
 
                 // redirects To Page asking user to return to Telegram
@@ -62,7 +55,9 @@ namespace app.Controllers.Helper
             if (data?.user.id == null) return false;
 
             var user = _mapper.Map<EpumpDataDto, EpumpData>(data);
-            var check = await _loginStatusRepository.IsUserLoggedInAsync(user.ChatId, user.ID);
+            
+            var check = await _userRepository.CheckUserExistsAsync(user.ChatId) 
+                            && await _epumpDataRepository.CheckUserExistsAsync(user.ID);
 
             if (check)
             {
@@ -70,18 +65,14 @@ namespace app.Controllers.Helper
             }
             else
             {
+                user.AuthDate = DateTime.Now;
+
                 await _epumpDataRepository.AddUserAsync(user);
                 _logger.LogInfo($"User {user.ChatId}, EpumpID: {user.ID} registered.");
 
                 await _userRepository.FindAndUpdateUserWithEpumpDataAsync(user.ChatId, user.ID);
                 _logger.LogInfo($"User {user.ChatId} database entry updated with EpumpID: {user.ID}");
 
-                await _loginStatusRepository.AddAsync(new LoginStatusEpump
-                {
-                    EpumpDataId = user.ID,
-                    LoginDate = DateTime.Now,
-                    IsLoggedIn = true
-                });
                 _logger.LogInfo($"User {user.ID} has been fully added to the database, at {DateTime.Now}");
 
                 return true;

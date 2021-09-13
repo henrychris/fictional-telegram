@@ -16,7 +16,6 @@ namespace app.Data
 
             await SeedUsers(context);
             await SeedEpumpData(context);
-            await SeedLoginData(context);
 
             await context.SaveChangesAsync();
         }
@@ -51,27 +50,6 @@ namespace app.Data
                 if (!check) continue;
                 var userToUpdate = await context.Users.FirstOrDefaultAsync(x => x.ChatId == item.ChatId);
                 userToUpdate.EpumpDataId = item.ID;
-            }
-        }
-
-        private static async Task SeedLoginData(DataContext context)
-        {
-            var loginData = await File.ReadAllTextAsync("Data/TelegramLogin.json");
-            var loginStatusList = JsonSerializer.Deserialize<List<LoginStatusTelegram>>(loginData);
-
-            // create login status of class LoginStatus
-            foreach (var item in loginStatusList)
-            {
-                await context.loginStatusTelegram.AddAsync(item);
-            }
-
-            var loginData2 = await File.ReadAllTextAsync("Data/EpumpLogin.json");
-            var EpumpLoginStatusList = JsonSerializer.Deserialize<List<LoginStatusEpump>>(loginData2);
-
-            // create login status of class LoginStatus
-            foreach (var item in EpumpLoginStatusList)
-            {
-                await context.loginStatusEpump.AddAsync(item);
             }
         }
     }
