@@ -136,7 +136,7 @@ You can control me with these commands:
                     }
                 });
 
-                return await _botClient.SendTextMessageAsync(message.Chat.Id, $"Make a Selection"
+                return await _botClient.SendTextMessageAsync(message.Chat.Id, "Make a Selection"
                     , replyMarkup: _loginKeyboard, parseMode: ParseMode.Markdown);
             }
 
@@ -157,7 +157,7 @@ You can control me with these commands:
                     }
                 });
 
-                return await _botClient.SendTextMessageAsync(message.Chat.Id, $"Make a Selection", replyMarkup: _loginKeyboard, parseMode: ParseMode.Markdown);
+                return await _botClient.SendTextMessageAsync(message.Chat.Id, "Make a Selection", replyMarkup: _loginKeyboard, parseMode: ParseMode.Markdown);
             }
 
             // Else the user must be completely logged in.

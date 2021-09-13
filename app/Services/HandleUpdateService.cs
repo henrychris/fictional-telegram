@@ -119,8 +119,9 @@ namespace app.Services
             _logger.LogInfo(log);
         }
 
-
-        // The hub. Where all updates go to first
+        /// <summary>
+        /// The hub. Where all updates go to first
+        /// </summary>
         public async Task EchoAsync(Update update)
         {
             var handler = update.Type switch
