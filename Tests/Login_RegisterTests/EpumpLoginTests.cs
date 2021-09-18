@@ -1,25 +1,29 @@
 using Xunit;
-using app.Components;
+using app.Data;
+using Moq;
 
 namespace Tests.Login_RegisterTests
 {
     public class EpumpLoginTests
     {
-        private readonly EpumpLogin _epumpLogin;
+        private readonly Mock<IEpumpLogin> epumpLogin;
         
-        public EpumpLoginTests(EpumpLogin epumpLogin)
+        public EpumpLoginTests()
         {
-            _epumpLogin = epumpLogin;
+            epumpLogin = new Mock<IEpumpLogin>();
+
+            epumpLogin.Setup(x => x.ValidateEmail(It.IsAny<string>()))
+            .Returns((string x) => new System.Net.Mail.MailAddress(x).Address == x);
         }
 
         [Fact]
         public void ValidateEmail_GivenValidEmail_ReturnsTrue()
         {
             // Arrange
-            var email = "ebenezer@mailinator.com";
+            var email = "ebenezer@gmail.com";
 
             // Act
-            var result = _epumpLogin.ValidateEmail(email);
+            var result = epumpLogin.Object.ValidateEmail(email);
             var expected = true;
 
             // Assert
@@ -27,19 +31,11 @@ namespace Tests.Login_RegisterTests
         }
 
         [Fact]
-        public void ValidateEmail_GivenInvalidEmail_ReturnsFalse()
+        public void ValidateEmail_GivenInvalidEmail_ReturnsFormatException()
         {
-            // Arrange
-            var email = "ebenezer@mailinator";
+            var email = "ebenezermailinator.x";
 
-            // Act
-            var result = _epumpLogin.ValidateEmail(email);
-            var expected = false;
-
-            // Assert
-            Assert.Equal(expected, result);
+            Assert.Throws<System.FormatException>(() => epumpLogin.Object.ValidateEmail(email));
         }
-
-        
     }
 }
