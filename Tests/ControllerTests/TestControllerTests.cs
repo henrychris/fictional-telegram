@@ -1,15 +1,13 @@
-﻿using System.Threading.Tasks;
-using app.Controllers;
+﻿using app.Controllers;
 using app.Controllers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using Xunit;
 
 namespace Tests.ControllerTests
 {
     public class TestControllerTests
     {
-        private readonly TestController _testController;
+        private readonly ITestController _testController;
         
         public TestControllerTests()
         {

@@ -11,10 +11,11 @@ using app.Data.DTOs;
 using app.Interfaces;
 using app.Errors;
 using System.Net;
+using app.Data;
 
 namespace app.Components
 {
-    public class EpumpLogin
+    public class EpumpLogin : IEpumpLogin
     {
         private readonly ITelegramBotClient _botClient;
         private readonly BotControllerHelper _botControllerHelper;
@@ -46,6 +47,7 @@ namespace app.Components
         {
             try
             {
+                // returns false in test
                 var address = new System.Net.Mail.MailAddress(email);
                 return address.Address == email;
             }
@@ -87,7 +89,7 @@ namespace app.Components
             return await _botClient.SendTextMessageAsync(message.Chat.Id, "An error occurred.");
         }
 
-        public async Task<bool> CheckIfOtpIsValid(long chatId, string otp)
+        private async Task<bool> CheckIfOtpIsValid(long chatId, string otp)
         {
             var email = await _userRepository.GetUserEmail(chatId);
             var response = await SendVerificationRequest(otp, email);

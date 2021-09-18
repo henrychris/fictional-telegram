@@ -145,7 +145,7 @@ You can control me with these commands:
             {
                 await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
 
-                _loginKeyboard = new(new[]
+                _loginKeyboard = new InlineKeyboardMarkup(new[]
                 {
                     new[]
                     {
