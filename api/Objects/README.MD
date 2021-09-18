@@ -1,0 +1,1 @@
+This folder contains objects which will be used to deserialize the JSON recieved
