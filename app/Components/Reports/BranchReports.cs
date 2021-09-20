@@ -30,7 +30,7 @@ namespace app.Components.Reports
             _userRepository = userRepository;
             _epumpDataRepository = epumpDataRepository;
             _botClient = botClient;
-            _client = httpClientFactory.CreateClient("EpumpReportApi");
+            _client = httpClientFactory.CreateClient("TestReportApi");
         }
 
         private static string ConvertTextToDateTime(string dateTimeText)
@@ -66,14 +66,14 @@ namespace app.Components.Reports
             var content = await GetReportWithSummaryDataAsync(message, uri, userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
             
-Total PMS Sold: {content.pmsAmountSold}
-Total AGO Sold: {content.agoAmountSold}
-Total DPK Sold: {content.dpkAmountSold}
-Total Amount Sold: {content.totalAmountSold}
-Total PMS Volume Sold: {content.pmsVolumeSold}
-Total AGO Volume Sold: {content.agoVolumeSold}
-Total DPK Volume Sold: {content.dpkVolumeSold}
-Total Volume Sold: {content.totalVolumeSold}
+Total PMS Sold: {content.PmsAmountSold}
+Total AGO Sold: {content.AgoAmountSold}
+Total DPK Sold: {content.DpkAmountSold}
+Total Amount Sold: {content.TotalAmountSold}
+Total PMS Volume Sold: {content.PmsVolumeSold}
+Total AGO Volume Sold: {content.AgoVolumeSold}
+Total DPK Volume Sold: {content.DpkVolumeSold}
+Total Volume Sold: {content.TotalVolumeSold}
 ");
 
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "BranchSalesTransactions.pdf"));
@@ -97,9 +97,9 @@ Total Volume Sold: {content.totalVolumeSold}
 
             var result = await GetReportWithSummaryDataAsync(message, uri, userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
-Amount of cashbacks : {result.cashbackAmount}
-Failed Transactions: {result.failedAmount}
-Succesful Transactions: {result.succesfulAmount}
+Amount of cashbacks : {result.CashbackAmount}
+Failed Transactions: {result.FailedAmount}
+Succesful Transactions: {result.SuccesfulAmount}
 ");
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "POS Transactions Report.pdf"));
         }   
@@ -120,8 +120,8 @@ Succesful Transactions: {result.succesfulAmount}
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
-Volume Discharged(Epump): {result.epumpDischarge}
-Volume Discharged(Manual): {result.manualDischarge}            
+Volume Discharged(Epump): {result.EpumpDischarge}
+Volume Discharged(Manual): {result.ManualDischarge}            
 ");
 
             return await _botClient.SendDocumentAsync(message.Chat.Id, new InputOnlineFile(_pdfReport, "BranchTanksFilledReport.pdf"));
@@ -140,9 +140,9 @@ Volume Discharged(Manual): {result.manualDischarge}
 
             var content = await GetReportWithSummaryDataAsync(message, uri, userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
-Total Volume Sold(Epump): {content.totalEpumpVolumeSold}
-Total Volume Sold(Manual): {content.totalManualVolumeSold}
-Variance: {content.totalVariance}
+Total Volume Sold(Epump): {content.TotalEpumpVolumeSold}
+Total Volume Sold(Manual): {content.TotalManualVolumeSold}
+Variance: {content.TotalVariance}
 ");
 
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "BranchVarianceReport.pdf"));
@@ -157,14 +157,14 @@ Variance: {content.totalVariance}
             var content = await GetReportWithSummaryDataAsync(message, uri, userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
-PMS Sold: {content.pmsAmountSold}
-AGO Sold: {content.agoAmountSold}
-DPK Sold: {content.dpkAmountSold}
-Total Amount Sold: {content.totalAmountSold}
-PMS Volume Sold: {content.pmsVolumeSold}
-AGO Volume Sold: {content.agoVolumeSold}
-DPK Volume Sold: {content.dpkVolumeSold}
-Total Volume Sold: {content.totalVolumeSold}
+PMS Sold: {content.PmsAmountSold}
+AGO Sold: {content.AgoAmountSold}
+DPK Sold: {content.DpkAmountSold}
+Total Amount Sold: {content.TotalAmountSold}
+PMS Volume Sold: {content.PmsVolumeSold}
+AGO Volume Sold: {content.AgoVolumeSold}
+DPK Volume Sold: {content.DpkVolumeSold}
+Total Volume Sold: {content.TotalVolumeSold}
 ");
 
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "ProductSummaryReport.pdf"));
@@ -185,7 +185,7 @@ Total Volume Sold: {content.totalVolumeSold}
             var result = await JsonSerializer.DeserializeAsync<SummaryData>(content);
 
             // TODO add handler for null reference exception
-            _pdfReport = new MemoryStream(result.pdfReport);
+            _pdfReport = new MemoryStream(result.PdfReport);
             return result;
         }
 

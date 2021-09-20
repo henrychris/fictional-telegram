@@ -3,63 +3,63 @@ namespace app.Components.Summary
     public class SummaryData
     {
         // TODO Name Variables better
-        public byte[] pdfReport { get; set; }
-        public string pmsAmount { get; set; }
-        public string agoAmount { get; set; }
-        public string dpkAmount { get; set; }
-        public string totalAmount { get; set; }
+        public byte[] PdfReport { get; set; }
+        public string PmsAmount { get; set; }
+        public string AgoAmount { get; set; }
+        public string DpkAmount { get; set; }
+        public string TotalAmount { get; set; }
 
         // pos transaction
-        public string cashbackAmount { get; set; }
-        public string succesfulAmount { get; set; }
-        public string failedAmount { get; set; }
+        public string CashbackAmount { get; set; }
+        public string SuccesfulAmount { get; set; }
+        public string FailedAmount { get; set; }
 
         // sales summary
-        public string pmsPumpSale { get; set; }
-        public string pmsTankSale { get; set; }
-        public string agoPumpSale { get; set; }
-        public string agoTankSale { get; set; }
-        public string dpkTankSale { get; set; }
-        public string dpkPumpSale { get; set; }
+        public string PmsPumpSale { get; set; }
+        public string PmsTankSale { get; set; }
+        public string AgoPumpSale { get; set; }
+        public string AgoTankSale { get; set; }
+        public string DpkTankSale { get; set; }
+        public string DpkPumpSale { get; set; }
 
         // volume
-        public string pmsVolume { get; set; }
-        public string agoVolume { get; set; }
-        public string dpkVolume { get; set; }
-        public string lpgVolume { get; set; }
-        public string totalVolume { get; set; }
+        public string PmsVolume { get; set; }
+        public string AgoVolume { get; set; }
+        public string DpkVolume { get; set; }
+        public string LpgVolume { get; set; }
+        public string TotalVolume { get; set; }
 
         // tanks filled
-        public string epumpDischarge { get; set; }
-        public string manualDischarge { get; set; }
+        public string EpumpDischarge { get; set; }
+        public string ManualDischarge { get; set; }
 
         // variance
-        public string totalEpumpVolumeSold { get; set; }
-        public string totalManualVolumeSold { get; set; }
-        public string totalVariance { get; set; }
+        public string TotalEpumpVolumeSold { get; set; }
+        public string TotalManualVolumeSold { get; set; }
+        public string TotalVariance { get; set; }
 
         // wallet fund
-        public string amountPaid { get; set; }
+        public string AmountPaid { get; set; }
 
         // asset groups
         public string numberOfAssets;
         public string numberOfAssetsRequiringAttention;
 
         // company walllet
-        public string walletBalance { get; set; }
-        public string walletBookBalance { get; set; }
+        public string WalletBalance { get; set; }
+        public string WalletBookBalance { get; set; }
 
         // outstanding payments
-        public string outstandingAmount { get; set; }
+        public string OutstandingAmount { get; set; }
 
         // product summary
-        public string pmsAmountSold { get; set; }
-        public string agoAmountSold { get; set; }
-        public string dpkAmountSold { get; set; }
-        public string pmsVolumeSold { get; set; }
-        public string agoVolumeSold { get; set; }
-        public string dpkVolumeSold { get; set; }
-        public string totalAmountSold { get; set; }
-        public string totalVolumeSold { get; set; }
+        public string PmsAmountSold { get; set; }
+        public string AgoAmountSold { get; set; }
+        public string DpkAmountSold { get; set; }
+        public string PmsVolumeSold { get; set; }
+        public string AgoVolumeSold { get; set; }
+        public string DpkVolumeSold { get; set; }
+        public string TotalAmountSold { get; set; }
+        public string TotalVolumeSold { get; set; }
     }
 }

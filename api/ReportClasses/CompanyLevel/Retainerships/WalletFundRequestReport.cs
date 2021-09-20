@@ -142,7 +142,7 @@ namespace api.ReportClasses.CompanyLevel.Retainerships
             document.Close();
 
             Summary summary = new();
-            summary.amountPaid = $"₦{amountPaid}";
+            summary.AmountPaid = $"₦{amountPaid}";
             summary.PdfReport = pdfstream.ToArray();
 
             return summary;

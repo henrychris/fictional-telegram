@@ -157,10 +157,10 @@ namespace api.ReportClasses.CompanyLevel
             document.Close();
 
             Summary summary = new();
-            summary.pmsVolume = $"{PMSVol:0.00}L";
-            summary.agoVolume = $"{AGOVol:0.00}L";
-            summary.dpkVolume = $"{DPKVol:0.00}L";
-            summary.lpgVolume = $"{LPGVol:0.00}L";
+            summary.PmsVolume = $"{PMSVol:0.00}L";
+            summary.AgoVolume = $"{AGOVol:0.00}L";
+            summary.DpkVolume = $"{DPKVol:0.00}L";
+            summary.LpgVolume = $"{LPGVol:0.00}L";
             summary.PdfReport = pdfstream.ToArray();
             
             return summary;

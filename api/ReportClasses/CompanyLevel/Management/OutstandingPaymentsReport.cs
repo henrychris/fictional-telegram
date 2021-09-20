@@ -145,7 +145,7 @@ namespace api.ReportClasses.CompanyLevel.Management
             document.Close();
 
             Summary summary = new();
-            summary.outstandingAmount = $"{outstandingAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.OutstandingAmount = $"{outstandingAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
             summary.PdfReport = pdfstream.ToArray();
 
             return summary;

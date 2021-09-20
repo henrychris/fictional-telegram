@@ -250,14 +250,14 @@ namespace api.ReportClasses.BranchLevel
 
             Summary summary = new();
             summary.PdfReport = pdfstream.ToArray();
-            summary.pmsAmountSold = $"{pmsTotalCost.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.pmsVolumeSold = $"{pmsTotalVolume}L";
-            summary.agoAmountSold = $"{agoTotalCost.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.agoVolumeSold = $"{agoTotalVolume}L";
-            summary.dpkAmountSold = $"{dpkTotalCost.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.dpkVolumeSold = $"{dpkTotalVolume}L";
-            summary.totalAmountSold = $"{totalCost.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.totalVolumeSold = $"{totalVolume}L";
+            summary.PmsAmountSold = $"{pmsTotalCost.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.PmsVolumeSold = $"{pmsTotalVolume}L";
+            summary.AgoAmountSold = $"{agoTotalCost.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.AgoVolumeSold = $"{agoTotalVolume}L";
+            summary.DpkAmountSold = $"{dpkTotalCost.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.DpkVolumeSold = $"{dpkTotalVolume}L";
+            summary.TotalAmountSold = $"{totalCost.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.TotalVolumeSold = $"{totalVolume}L";
 
             return summary;
         }

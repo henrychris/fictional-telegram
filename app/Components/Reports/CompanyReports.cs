@@ -27,7 +27,7 @@ namespace app.Components.Reports
         {
             _epumpDataRepository = epumpDataRepository;
             _botClient = botClient;
-            _client = httpClientFactory.CreateClient("EpumpReportApi");
+            _client = httpClientFactory.CreateClient("TestReportApi");
         }
 
         private static string ConvertTextToDateTime(string dateTimeText)
@@ -52,7 +52,7 @@ namespace app.Components.Reports
 
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, $"Summary\nYou sold:\nPMS:{result.pmsAmount}\nAGO: {result.agoAmount}\nDPK: {result.dpkAmount}\nTotal: {result.totalAmount}");
+            await _botClient.SendTextMessageAsync(message.Chat.Id, $"Summary\nYou sold:\nPMS:{result.PmsAmount}\nAGO: {result.AgoAmount}\nDPK: {result.DpkAmount}\nTotal: {result.TotalAmount}");
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyBranchSalesReport.pdf"));
         }
 
@@ -83,7 +83,7 @@ namespace app.Components.Reports
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
-Outstanding Amount: {result.outstandingAmount}");
+Outstanding Amount: {result.OutstandingAmount}");
 
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyOutstandingPaymentsReport.pdf"));
         }
@@ -106,13 +106,13 @@ Outstanding Amount: {result.outstandingAmount}");
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
-PMS Tank Sales: {result.pmsTankSale}
-AGO Tank Sales: {result.agoTankSale}
-DPK Tank Sales: {result.dpkTankSale}
-PMS Pump Sales: {result.pmsPumpSale}
-AGO Pump Sales: {result.agoPumpSale}
-DPK Pump Sales: {result.dpkPumpSale}
-Total Sales: {result.totalAmount}
+PMS Tank Sales: {result.PmsTankSale}
+AGO Tank Sales: {result.AgoTankSale}
+DPK Tank Sales: {result.DpkTankSale}
+PMS Pump Sales: {result.PmsPumpSale}
+AGO Pump Sales: {result.AgoPumpSale}
+DPK Pump Sales: {result.DpkPumpSale}
+Total Sales: {result.TotalAmount}
 ");
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanySalesSummaryReport.pdf"));
         }
@@ -125,10 +125,10 @@ Total Sales: {result.totalAmount}
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
-PMS Volume: {result.pmsVolume}
-AGO Volume: {result.agoVolume}
-LPG Volume: {result.dpkVolume}
-DPK Volume: {result.lpgVolume}
+PMS Volume: {result.PmsVolume}
+AGO Volume: {result.AgoVolume}
+LPG Volume: {result.DpkVolume}
+DPK Volume: {result.LpgVolume}
 ");
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyTankStockReport.pdf"));
         }
@@ -147,8 +147,8 @@ DPK Volume: {result.lpgVolume}
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
-Volume Discharged(Epump): {result.epumpDischarge}
-Volume Discharged(Manual): {result.manualDischarge}
+Volume Discharged(Epump): {result.EpumpDischarge}
+Volume Discharged(Manual): {result.ManualDischarge}
 ");
 
             return await _botClient.SendDocumentAsync(message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyTanksFilledReport.pdf"));
@@ -169,9 +169,9 @@ Volume Discharged(Manual): {result.manualDischarge}
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
-Total Volume Sold(Epump): {result.totalEpumpVolumeSold}
-Total Volume Sold(Manual): {result.totalManualVolumeSold}
-Variance: {result.totalVariance}");
+Total Volume Sold(Epump): {result.TotalEpumpVolumeSold}
+Total Volume Sold(Manual): {result.TotalManualVolumeSold}
+Variance: {result.TotalVariance}");
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyVarianceReport.pdf"));
         }
 
@@ -183,7 +183,7 @@ Variance: {result.totalVariance}");
             try
             {
                 var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
-                await _botClient.SendTextMessageAsync(query.Message.Chat.Id, $"Summary\nAmount Paid: {result.amountPaid}");
+                await _botClient.SendTextMessageAsync(query.Message.Chat.Id, $"Summary\nAmount Paid: {result.AmountPaid}");
             }
             catch (Exception e)
             {
@@ -200,9 +200,9 @@ Variance: {result.totalVariance}");
 
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
-Amount of cashbacks : {result.cashbackAmount}
-Failed Transactions: {result.failedAmount}
-Succesful Transactions: {result.succesfulAmount}
+Amount of cashbacks : {result.CashbackAmount}
+Failed Transactions: {result.FailedAmount}
+Succesful Transactions: {result.SuccesfulAmount}
 ");
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "Pos Transactions Report.pdf"));
         }
@@ -215,8 +215,8 @@ Succesful Transactions: {result.succesfulAmount}
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
-Wallet Balance: {ParseAsCurrency(result.walletBalance)}
-Wallet BookBalance: {ParseAsCurrency(result.walletBookBalance)}
+Wallet Balance: {ParseAsCurrency(result.WalletBalance)}
+Wallet BookBalance: {ParseAsCurrency(result.WalletBookBalance)}
 ");
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyWalletReport.pdf"));
         }
@@ -246,7 +246,7 @@ Wallet BookBalance: {ParseAsCurrency(result.walletBookBalance)}
             var result = await JsonSerializer.DeserializeAsync<SummaryData>(content);
 
             // Todo add check for NullReferenceException
-            _pdfReport = new MemoryStream(result.pdfReport);
+            _pdfReport = new MemoryStream(result.PdfReport);
             return result;
         }
 

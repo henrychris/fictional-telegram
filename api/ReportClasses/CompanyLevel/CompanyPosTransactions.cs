@@ -205,9 +205,9 @@ namespace api.ReportClasses.CompanyLevel
             document.Close();
 
             Summary summary = new();
-            summary.cashbackAmount = $"{cashbackAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.failedAmount = $"{failedAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.succesfulAmount = $"{succesfulAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.CashbackAmount = $"{cashbackAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.FailedAmount = $"{failedAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.SuccesfulAmount = $"{succesfulAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
             summary.PdfReport = pdfstream.ToArray();
 
             return summary;

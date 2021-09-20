@@ -197,8 +197,8 @@ namespace api.ReportClasses.BranchLevel
             document.Close();
 
             Summary summary = new();
-            summary.epumpDischarge = $"{epumpDischarge:0.00} L";
-            summary.manualDischarge = $"{manualDischarge:0.00} L";
+            summary.EpumpDischarge = $"{epumpDischarge:0.00} L";
+            summary.ManualDischarge = $"{manualDischarge:0.00} L";
             summary.PdfReport = pdfstream.ToArray();
 
             return summary;

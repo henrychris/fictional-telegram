@@ -171,13 +171,13 @@ namespace api.ReportClasses.CompanyLevel
             document.Close();
 
             Summary summary = new();
-            summary.pmsTankSale = $"{pmsTankSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.pmsPumpSale = $"{pmsPumpSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.agoPumpSale = $"{agoPumpSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.dpkPumpSale = $"{dpkPumpSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.pmsTankSale = $"{pmsTankSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.agoTankSale = $"{agoTankSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.dpkTankSale = $"{dpkTankSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.PmsTankSale = $"{pmsTankSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.PmsPumpSale = $"{pmsPumpSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.AgoPumpSale = $"{agoPumpSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.DpkPumpSale = $"{dpkPumpSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.PmsTankSale = $"{pmsTankSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.AgoTankSale = $"{agoTankSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.DpkTankSale = $"{dpkTankSale.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
             summary.TotalAmount = $"{totalSales.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
 
             summary.PdfReport = pdfstream.ToArray();

@@ -157,8 +157,8 @@ namespace api.ReportClasses.CompanyLevel.Management
             document.Close();
 
             Summary summary = new();
-            summary.walletBalance = walletBalance;
-            summary.walletBookBalance = walletBookBalance;
+            summary.WalletBalance = walletBalance;
+            summary.WalletBookBalance = walletBookBalance;
 
             summary.PdfReport = pdfstream.ToArray();
             return summary;

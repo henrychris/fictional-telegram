@@ -213,17 +213,17 @@ namespace api.ReportClasses.BranchLevel
             document.Close();
 
             Summary summary = new();
-            summary.pmsAmountSold = $"{totalPmsAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.agoAmountSold = $"{totalAgoAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.dpkAmountSold = $"{totalDpkAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.pmsVolumeSold = $"{totalPmsVolume:0.00}L";
-            summary.agoVolumeSold = $"{totalAgoVolume:0.00}L";
-            summary.dpkVolumeSold = $"{totalDpkVolume:0.00}L";
+            summary.PmsAmountSold = $"{totalPmsAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.AgoAmountSold = $"{totalAgoAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.DpkAmountSold = $"{totalDpkAmount.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.PmsVolumeSold = $"{totalPmsVolume:0.00}L";
+            summary.AgoVolumeSold = $"{totalAgoVolume:0.00}L";
+            summary.DpkVolumeSold = $"{totalDpkVolume:0.00}L";
             
             var tempAmtSold = totalPmsAmount + totalAgoAmount + totalDpkAmount;
             var tempVolSold = totalPmsVolume + totalAgoVolume + totalDpkVolume;
-            summary.totalAmountSold = $"{tempAmtSold.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
-            summary.totalVolumeSold = $"{tempVolSold:0.00}L";
+            summary.TotalAmountSold = $"{tempAmtSold.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")))}";
+            summary.TotalVolumeSold = $"{tempVolSold:0.00}L";
 
             summary.PdfReport = pdfstream.ToArray();
             return summary;

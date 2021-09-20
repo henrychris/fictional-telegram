@@ -176,9 +176,9 @@ namespace api.ReportClasses.CompanyLevel
             document.Close();
 
             Summary summary = new();
-            summary.totalEpumpVolumeSold = $"{totalEpumpVolumeSold:0.00}L";
-            summary.totalManualVolumeSold = $"{totalManualVolumeSold:0.00}L";
-            summary.totalVariance = $"{totalVariance:0.00}L";
+            summary.TotalEpumpVolumeSold = $"{totalEpumpVolumeSold:0.00}L";
+            summary.TotalManualVolumeSold = $"{totalManualVolumeSold:0.00}L";
+            summary.TotalVariance = $"{totalVariance:0.00}L";
             summary.PdfReport = pdfstream.ToArray();
             return summary;
         }
