@@ -148,7 +148,7 @@ namespace app
                 client.BaseAddress = new Uri(BotConfig.EpumpReportUri);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
-            services.AddHttpClient("TestApi", client =>
+            services.AddHttpClient("TestReportApi", client =>
             {
                 client.BaseAddress = new Uri("https://localhost:5001/");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
