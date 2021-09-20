@@ -28,16 +28,33 @@ namespace app
 
         public static void AddComponents(this IServiceCollection services)
         {
+            services.ConfigureLoggerService();
+            services.ConfigureAutoMapper();
+
+            services.AddScoped<ErrorHandler>();
+            
             services.AddTransient<Keyboards>();
             services.AddTransient<EpumpLogin>();
-            services.AddScoped<ErrorHandler>();
             services.AddTransient<BotControllerHelper>();
 
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddRepositories();
+            services.AddKeyboards();
+        }
+
+        public static void AddRepositories(this IServiceCollection services)
+        {
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IEpumpDataRepository, EpumpDataRepository>();
+        }
+
+        public static void AddKeyboards(this IServiceCollection services)
+        {
             services.AddTransient<BranchReportsKeyboards>();
             services.AddTransient<BranchReports>();
             services.AddTransient<CompanyReports>();
             services.AddTransient<CompanyReportsKeyboards>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         public static void ConfigureAutoMapper(this IServiceCollection services)
@@ -75,7 +92,6 @@ namespace app
                     var pgPass = pgUserPass.Split(":")[1];
                     var pgHost = pgHostPort.Split(":")[0];
                     var pgPort = pgHostPort.Split(":")[1];
-                    // SslMode = SslMode.Require, TrustServerCertificate = true
 
                     connStr = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};SSL Mode=Require;TrustServerCertificate=True;";
                 }
@@ -159,13 +175,7 @@ namespace app
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
 
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IEpumpDataRepository, EpumpDataRepository>();
-
-            services.ConfigureLoggerService();
-            services.ConfigureAutoMapper();
             services.ConfigureDbContext(BotConfig.DefaultConnection);
-
             services.AddComponents();
             services.AddSwaggerGen(c =>
             {
