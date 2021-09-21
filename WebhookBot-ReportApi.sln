@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "app", "app\app.csproj", "{CA2487A4-E169-40DE-9625-D095E89DE00A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "telegram-bot", "app\telegram-bot.csproj", "{CA2487A4-E169-40DE-9625-D095E89DE00A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{EF3EE2E8-2E6B-4100-AB91-4D38B6CB5B0C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "api", "api\api.csproj", "{35188B13-44D3-4577-AC36-E618ADCB2D0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "report-api", "api\report-api.csproj", "{35188B13-44D3-4577-AC36-E618ADCB2D0D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoggerService", "LoggerService\LoggerService.csproj", "{0804B15C-F019-4B74-9656-BE5AA347C1AE}"
 EndProject
