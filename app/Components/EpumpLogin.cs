@@ -27,6 +27,7 @@ namespace app.Components
         IHttpClientFactory httpClientFactory, BotControllerHelper botControllerHelper
         , IConfiguration configuration)
         {
+            // TODO get OTP uri from config file
             _botControllerHelper = botControllerHelper;
             _userRepository = userRepository;
             _botClient = botClient;
@@ -68,6 +69,8 @@ namespace app.Components
                 return await _botClient.SendTextMessageAsync(message.Chat.Id, "Please input a valid email", replyMarkup: new ForceReplyMarkup());
             }
 
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Processing... Please wait.");
+
             // send request for verification to API
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {BotConfiguration.AdminToken}");
             await _client.GetAsync($"Account/TelegramOTP?email={email}&chatId={message.Chat.Id}");
@@ -92,7 +95,7 @@ namespace app.Components
         private async Task<bool> CheckIfOtpIsValid(long chatId, string otp)
         {
             var email = await _userRepository.GetUserEmail(chatId);
-            var response = await SendVerificationRequest(otp, email);
+            var response = await SendVerificationRequest(otp, email, chatId);
 
             if (!response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -106,11 +109,12 @@ namespace app.Components
             return await _botControllerHelper.RegisterEpumpUser(result);
         }
 
-        private async Task<HttpResponseMessage> SendVerificationRequest(string otp, string email)
+        private async Task<HttpResponseMessage> SendVerificationRequest(string otp, string email, long chatId)
         {
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {BotConfiguration.AdminToken}");
-
+            await _botClient.SendTextMessageAsync(chatId, "Processing... Please wait.");
             var request = new HttpRequestMessage(HttpMethod.Post, $"Account/VerifyTelegramOTP?OTP={otp}&email={email}");
+            
             var response = await _client.SendAsync(request);
             return response;
         }
