@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\app\app.csproj" />
+    <ProjectReference Include="..\app\telegram-bot.csproj" />
   </ItemGroup>
 
 </Project>
