@@ -31,4 +31,8 @@
       <Folder Include="Data\Migrations\" />
     </ItemGroup>
 
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="dotnet run" />
+    </Target>
+
   </Project>
