@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using app.Interfaces;
+using Contracts;
 using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -14,13 +15,15 @@ namespace app.Components
         private readonly IUserRepository _userRepository;
         private readonly BotConfiguration _botConfig;
         private readonly IEpumpDataRepository _epumpDataRepository;
+        private readonly ILoggerManager _logger;
         private InlineKeyboardMarkup _loginKeyboard;
 
         public Keyboards(ITelegramBotClient botClient,
         IUserRepository userRepository, IConfiguration configuration,
-        IEpumpDataRepository epumpDataRepository)
+        IEpumpDataRepository epumpDataRepository, ILoggerManager logger)
         {
             _epumpDataRepository = epumpDataRepository;
+            _logger = logger;
             _userRepository = userRepository;
             _botClient = botClient;
             _botConfig = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
@@ -87,7 +90,9 @@ namespace app.Components
             await _userRepository.DeleteUser(message.Chat.Id);
             var user = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
             await _epumpDataRepository.DeleteUserAsync(user.ID);
+            
             await _botClient.SendTextMessageAsync(message.Chat.Id, "Your data has been deleted successfully", replyMarkup: new ReplyKeyboardRemove());
+            _logger.LogInfo($"User {message.Chat.Id} has been removed from the database.");
         }
 
         public async Task<Message> SendMenu(Message message)
