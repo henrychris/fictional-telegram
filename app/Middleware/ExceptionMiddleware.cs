@@ -30,13 +30,13 @@ namespace app.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error in ExceptionMiddleware: {ex.Message}\n{ex.StackTrace}");
+                _logger.LogError(ex, $"Error in ExceptionMiddleware: {ex.Message}\n{ex.StackTrace}\nINNER EXCEPTION\n\n{ex.InnerException}");
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
                 var response = _env.IsDevelopment()
                 ? new ErrorDetails(context.Response.StatusCode, ex.Message, ex.StackTrace)
-                : new ErrorDetails(context.Response.StatusCode, "Internal Server Error");
+                : new ErrorDetails(context.Response.StatusCode, ex.Message, "Internal Server Error");
 
                 var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
                 var json = JsonSerializer.Serialize(response, options);
