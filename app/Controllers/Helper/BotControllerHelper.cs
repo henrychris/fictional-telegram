@@ -30,7 +30,7 @@ namespace app.Controllers.Helper
             if (data == null) return BadRequest("No data");
 
             var user = _mapper.Map<AppUser>(data);
-
+            user.EpumpDataId = "0";
             // if (await _loginStatusRepository.IsUserLoggedInAsync_Telegram(user.ChatId))
             if (await _userRepository.CheckUserExistsAsync(data.id))
             {
