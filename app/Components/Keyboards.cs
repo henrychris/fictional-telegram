@@ -92,15 +92,34 @@ namespace app.Components
 
         public async Task<Message> SendMenu(Message message)
         {
+            InlineKeyboardMarkup menuKeyboard;
+
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
-            InlineKeyboardMarkup menuKeyboard = new(new[]
+            var userCheck = await CheckForUserInDb(message);
+
+            if (userCheck)
+            {
+                menuKeyboard = new(new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("Logout", "DeleteUserData"),
+                    InlineKeyboardButton.WithCallbackData("View Reports","Reports")
+                }
+            });
+            }
+
+            else
+            {
+                menuKeyboard = new(new[]
             {
                 new []
                 {
                     InlineKeyboardButton.WithCallbackData("Login"),
-                    InlineKeyboardButton.WithCallbackData("Reports")
+                    InlineKeyboardButton.WithCallbackData("View Reports","Reports")
                 }
             });
+            }
             return await _botClient.SendTextMessageAsync(message.Chat.Id, "Welcome to Epump!", replyMarkup: menuKeyboard);
         }
 

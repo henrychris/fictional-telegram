@@ -97,7 +97,7 @@ namespace app.Components
             var email = await _userRepository.GetUserEmail(chatId);
             var response = await SendVerificationRequest(otp, email, chatId);
 
-            if (!response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
+            if (!response.IsSuccessStatusCode)
             {
                 await HandleError(chatId, response);
                 return false;
@@ -114,17 +114,24 @@ namespace app.Components
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {BotConfiguration.AdminToken}");
             await _botClient.SendTextMessageAsync(chatId, "Processing... Please wait.");
             var request = new HttpRequestMessage(HttpMethod.Post, $"Account/VerifyTelegramOTP?OTP={otp}&email={email}");
-            
+
             var response = await _client.SendAsync(request);
             return response;
         }
 
         private async Task HandleError(long chatId, HttpResponseMessage response)
         {
-            var content = await response.Content.ReadAsStreamAsync();
-            var result = await JsonSerializer.DeserializeAsync<EpumpError>(content);
-
-            await _botClient.SendTextMessageAsync(chatId, result.message);
+            if (response.Content.Headers.ContentLength <= 1)
+            {
+                string reasonPhrase = response.ReasonPhrase;
+                await _botClient.SendTextMessageAsync(chatId, reasonPhrase);
+            }
+            else
+            {
+                var contentStream = await response.Content.ReadAsStreamAsync();
+                EpumpError result = await JsonSerializer.DeserializeAsync<EpumpError>(contentStream);
+                await _botClient.SendTextMessageAsync(chatId, result.message);
+            }
         }
     }
 }
