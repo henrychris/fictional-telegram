@@ -101,7 +101,7 @@ namespace app.Services
 
             var action = (message.Text.Split(' ').First()) switch
             {
-                "/start" => _keyboards.Start(message),
+                "/start" => GetPayload(message),
                 "/login" => _keyboards.SendLoginKeyboard(message),
                 "/menu" => _keyboards.SendMenu(message),
                 "/help" => _keyboards.SendHelp(message),
@@ -117,6 +117,24 @@ namespace app.Services
             var log = $"The message was sent to {sentMessage.Chat.Id} with id: {sentMessage.MessageId}";
             Console.WriteLine(log);
             _logger.LogInfo(log);
+        }
+
+        /// <summary>
+        /// This function strips /start from the message.Text.
+        /// If nothing remains, it sends the start keyboard.
+        /// <para> Check https://core.telegram.org/bots#deep-linking for more info.</para>
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns>Displays either the Start message or the Login Keyboard.</returns>
+        private async Task<Message> GetPayload(Message message)
+        {
+            var textReceived = message.Text;
+
+            textReceived = textReceived.Remove(0, 6).Trim();
+
+            if (textReceived.Length == 0) return await _keyboards.Start(message);
+
+            return await _keyboards.SendLoginKeyboard(message);
         }
 
         /// <summary>
