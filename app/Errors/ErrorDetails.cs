@@ -8,8 +8,8 @@ namespace app.Errors
             Message = message;
             Details = details;
         }
-        private int StatusCode { get; set; }
-        private string Message { get; set; }
-        private string Details { get; set; }
+        public int StatusCode { get; set; }
+        public string Message { get; set; }
+        public string Details { get; set; }
     }
 }
