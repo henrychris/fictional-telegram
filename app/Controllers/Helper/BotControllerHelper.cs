@@ -15,7 +15,7 @@ namespace app.Controllers.Helper
         private readonly ILoggerManager _logger;
         private readonly IUserRepository _userRepository;
         private readonly IEpumpDataRepository _epumpDataRepository;
-        
+
         public BotControllerHelper(IMapper mapper, ILoggerManager logger, IUserRepository userRepository,
         IEpumpDataRepository epumpDataRepository)
         {
@@ -30,7 +30,7 @@ namespace app.Controllers.Helper
             if (data == null) return BadRequest("No data");
 
             var user = _mapper.Map<AppUser>(data);
-            
+
             if (await _userRepository.CheckUserExistsAsync(data.id))
             {
                 return BadRequest("User already exists");
@@ -41,7 +41,7 @@ namespace app.Controllers.Helper
                 _logger.LogInfo($"User {user.FirstName} with ID {user.ChatId} has been added to the database, at {DateTime.Now}");
 
                 // redirects To Page asking user to return to Telegram
-                return Redirect("https://epump-login-test.herokuapp.com/");
+                return Redirect("https://t.me/EpumpTestBot?start=login");
             }
         }
 
@@ -54,8 +54,8 @@ namespace app.Controllers.Helper
             if (data?.user.id == null) return false;
 
             var user = _mapper.Map<EpumpDataDto, EpumpData>(data);
-            
-            var check = await _userRepository.CheckUserExistsAsync(user.ChatId) 
+
+            var check = await _userRepository.CheckUserExistsAsync(user.ChatId)
                             && await _epumpDataRepository.CheckUserExistsAsync(user.ID);
 
             if (check)
