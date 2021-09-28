@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/telegram-botdbserver/databases/telegram-bot_db",
+      "type": "mssql.azure",
+      "connectionId": "BotConfiguration:DefaultConnection"
+    }
+  }
+}
