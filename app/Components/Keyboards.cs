@@ -108,8 +108,8 @@ namespace app.Components
             {
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData("Logout", "DeleteUserData"),
-                    InlineKeyboardButton.WithCallbackData("View Reports","Reports")
+                    InlineKeyboardButton.WithCallbackData("View Reports","Reports"),
+                    InlineKeyboardButton.WithCallbackData("Logout", "DeleteUserData")
                 }
             });
             }
