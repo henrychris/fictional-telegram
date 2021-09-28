@@ -69,7 +69,7 @@ namespace app.Components
                 return await _botClient.SendTextMessageAsync(message.Chat.Id, "Please input a valid email", replyMarkup: new ForceReplyMarkup());
             }
 
-            await _botClient.SendTextMessageAsync(message.Chat.Id, "Processing... Please wait.");
+            await _botClient.SendTextMessageAsync(message.Chat.Id, "Validating email... Please wait.");
 
             // send request for verification to API
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {BotConfiguration.AdminToken}");
@@ -112,7 +112,7 @@ namespace app.Components
         private async Task<HttpResponseMessage> SendVerificationRequest(string otp, string email, long chatId)
         {
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {BotConfiguration.AdminToken}");
-            await _botClient.SendTextMessageAsync(chatId, "Processing... Please wait.");
+            await _botClient.SendTextMessageAsync(chatId, "Verifying OTP... Please wait.");
             var request = new HttpRequestMessage(HttpMethod.Post, $"Account/VerifyTelegramOTP?OTP={otp}&email={email}");
 
             var response = await _client.SendAsync(request);
