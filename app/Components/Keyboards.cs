@@ -152,11 +152,7 @@ You can control me with these commands:
                 {
                     new []
                     {
-                        InlineKeyboardButton.WithUrl("Login", _botConfig.TelegramLoginUrl),
-                    },
-                    new[]
-                    {
-                            InlineKeyboardButton.WithCallbackData("Back", "Menu"),
+                        InlineKeyboardButton.WithUrl("Authorize With Telegram", _botConfig.TelegramLoginUrl),
                     }
                 });
 
