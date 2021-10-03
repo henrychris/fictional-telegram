@@ -76,18 +76,23 @@ namespace api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "api v1");
+                c.RoutePrefix = string.Empty;
+            });
+
+            if (env.IsDevelopment() || env.IsProduction())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "api v1"));
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            app.UseCors(policy => 
+            app.UseCors(policy =>
             policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()
             );
 
