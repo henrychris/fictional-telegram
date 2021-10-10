@@ -1,20 +1,21 @@
-using System;
-using System.IO;
-using app.Entities;
+﻿using app.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.IO;
 
 namespace app.Data
 {
-    public class DataContext : DbContext
+    public class PostGresDataContext : DbContext
     {
-        public DataContext()
+        public PostGresDataContext()
         {
+
         }
 
-        public DataContext(DbContextOptions<DataContext> options) : base(options)
+        public PostGresDataContext(DbContextOptions<PostGresDataContext> options) : base(options)
         {
-        }
+        }        
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -22,13 +23,13 @@ namespace app.Data
             {
                 IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.Development.json")
                 .Build();
                 var connectionString = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
 
                 string connStr = connectionString.DefaultConnection;
 
-                optionsBuilder.UseSqlServer(connStr);
+                optionsBuilder.UseNpgsql(connStr);
             };
         }
 
