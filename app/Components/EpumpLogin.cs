@@ -10,7 +10,6 @@ using app.Controllers.Helper;
 using app.Data.DTOs;
 using app.Interfaces;
 using app.Errors;
-using System.Net;
 using app.Data;
 
 namespace app.Components
@@ -27,12 +26,10 @@ namespace app.Components
         IHttpClientFactory httpClientFactory, BotControllerHelper botControllerHelper
         , IConfiguration configuration)
         {
-            // TODO get OTP uri from config file
             _botControllerHelper = botControllerHelper;
             _userRepository = userRepository;
             _botClient = botClient;
-            _client = httpClientFactory.CreateClient();
-            _client.BaseAddress = new Uri("https://epump.club/");
+            _client = httpClientFactory.CreateClient("OTPUri");
 
             BotConfiguration = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
         }
@@ -48,7 +45,6 @@ namespace app.Components
         {
             try
             {
-                // returns false in test
                 var address = new System.Net.Mail.MailAddress(email);
                 return address.Address == email;
             }
@@ -88,6 +84,7 @@ namespace app.Components
                 return await _botClient.SendTextMessageAsync(message.Chat.Id,
                     "Success!\nWelcome to Epump. \nUse /menu to get started");
 
+            // maybe remove the message below?
             await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId);
             return await _botClient.SendTextMessageAsync(message.Chat.Id, "An error occurred.");
         }
@@ -121,16 +118,23 @@ namespace app.Components
 
         private async Task HandleError(long chatId, HttpResponseMessage response)
         {
-            if (response.Content.Headers.ContentLength <= 1)
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                string reasonPhrase = response.ReasonPhrase;
-                await _botClient.SendTextMessageAsync(chatId, reasonPhrase);
+                await _botClient.SendTextMessageAsync(chatId, "The OTP was incorrect or you may not be authorized to use this" +
+                " application.");
+                return;
+            }
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                await _botClient.SendTextMessageAsync(chatId, "You do not have the required roles to use this application.");
+                return;
             }
             else
             {
                 var contentStream = await response.Content.ReadAsStreamAsync();
                 EpumpError result = await JsonSerializer.DeserializeAsync<EpumpError>(contentStream);
                 await _botClient.SendTextMessageAsync(chatId, result.message);
+                return;
             }
         }
     }
