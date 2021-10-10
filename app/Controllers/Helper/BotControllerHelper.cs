@@ -41,7 +41,7 @@ namespace app.Controllers.Helper
                 _logger.LogInfo($"User {user.FirstName} with ID {user.ChatId} has been added to the database, at {DateTime.Now}");
 
                 // redirects To Page asking user to return to Telegram
-                return Redirect("https://t.me/EpumpTestBot?start=login");
+                return Redirect("https://t.me/EpumpBot?start=login");
             }
         }
 
