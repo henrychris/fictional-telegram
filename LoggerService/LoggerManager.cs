@@ -16,6 +16,12 @@ namespace LoggerService
         {
             logger.Error(ex, message);
         }
+
+        public void LogError(string message)
+        {
+            logger.Error(message);
+        }
+
         public void LogInfo(string message)
         {
             logger.Info(message);
