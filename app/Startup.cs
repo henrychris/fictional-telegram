@@ -64,11 +64,24 @@ namespace app
 
         public static void ConfigureDbContext(this IServiceCollection services, string dbConnectionString)
         {
-            services.AddDbContext<DataContext>(options =>
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            if (env == "Production")
             {
-                // TODO add conditional statement that sets the connection string
-                options.UseSqlServer(dbConnectionString);
-            });
+                services.AddDbContext<DataContext>(
+                    options =>
+                    {
+                        options.UseSqlServer(dbConnectionString);
+                    });
+            }
+            else
+            {
+                services.AddDbContext<PostGresDataContext>(
+                    options =>
+                    {
+                        options.UseNpgsql(dbConnectionString);
+                    });
+            }
         }
         public static void ConfigureLoggerService(this IServiceCollection services)
         {
@@ -142,6 +155,10 @@ namespace app
             {
                 client.BaseAddress = new Uri(BotConfig.EpumpApiUri);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+            services.AddHttpClient("OTPUri", client=>
+            {
+                client.BaseAddress = new Uri(BotConfig.OTPUri);
             });
 
             services.ConfigureDbContext(BotConfig.DefaultConnection);
