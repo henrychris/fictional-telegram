@@ -20,15 +20,28 @@ namespace app
             ServerStart = DateTime.Now;
             try
             {
-                var context = services.GetRequiredService<DataContext>();
-                await context.Database.MigrateAsync();
-                // await Seed.SeedDataBase(context);
+                var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+                if (env == "Production")
+                {
+                    var context = services.GetRequiredService<DataContext>();
+                    await context.Database.MigrateAsync();
+                    // await Seed.SeedDataBase(context);
+                }
+                else
+                {
+                    var context = services.GetRequiredService<PostGresDataContext>();
+                    await context.Database.MigrateAsync();
+                    // await Seed.SeedDataBase(context);
+                }
+
             }
             catch (Exception ex)
             {
                 var errorHandler = services.GetRequiredService<ErrorHandler>();
                 await errorHandler.HandleErrorAsync(ex);
                 Console.WriteLine("An error occurred during migration.");
+                Console.WriteLine(ex.Message);
             }
 
             await host.RunAsync();
