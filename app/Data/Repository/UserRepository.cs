@@ -7,9 +7,12 @@ using app.Interfaces;
 
 namespace app.Data.Repository
 {
+    // ! When pushing online change POstgresContext to DataContext
+
     public class UserRepository : DbContext, IUserRepository
     {
         private readonly ErrorHandler _errorHandler;
+        
         public UserRepository(ErrorHandler errorHandler)
         {
             _errorHandler = errorHandler;
