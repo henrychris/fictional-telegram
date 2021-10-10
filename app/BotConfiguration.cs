@@ -6,7 +6,7 @@ namespace app
         public string WebhookUrl { get; init; }
         public string DefaultConnection { get; init; }
         public string TelegramLoginUrl { get; init; }
-        public string EpumpLoginUrl { get; init; }
+        public string OTPUri { get; init; }
         public string EpumpReportUri { get; init; }
         public string EpumpApiUri { get; init; }
         public string AdminToken { get; init; }
