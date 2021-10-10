@@ -52,6 +52,7 @@ namespace app.Services
                 "Menu" => _keyboards.SendMenu(callbackQuery.Message),
                 "Login" => _keyboards.SendLoginKeyboard(callbackQuery.Message),
                 "Reports" => _keyboards.SendReportKeyboard(callbackQuery.Message),
+                "LogOut" => _keyboards.SendConfirmationKeyboard(callbackQuery.Message),
                 "DeleteUserData" => _keyboards.DeleteUserData(callbackQuery.Message),
 
                 "EpumpLogin" => _epumpLogin.SendEpumpLoginKeyboard(callbackQuery.Message),
