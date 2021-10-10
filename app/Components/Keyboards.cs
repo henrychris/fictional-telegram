@@ -72,14 +72,14 @@ namespace app.Components
             {
                 new []
                 {
-                    InlineKeyboardButton.WithCallbackData("Delete My Data", "DeleteUserData"),
+                    InlineKeyboardButton.WithCallbackData("Yes", "DeleteUserData"),
                 }
                 , new []
                 {
                     InlineKeyboardButton.WithCallbackData("Back", "Menu")
                 }
             });
-            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Doing this will PERMANENTLY delete your data.\nYou will have to log back in to use this bot again.", replyMarkup: keyboard);
+            return await _botClient.SendTextMessageAsync(message.Chat.Id, "Doing this will PERMANENTLY delete your data.\nYou will have to log back in to use this bot again. Continue?", replyMarkup: keyboard);
 
         }
 
@@ -109,7 +109,7 @@ namespace app.Components
                 new []
                 {
                     InlineKeyboardButton.WithCallbackData("View Reports","Reports"),
-                    InlineKeyboardButton.WithCallbackData("Logout", "DeleteUserData")
+                    InlineKeyboardButton.WithCallbackData("Logout", "LogOut")
                 }
             });
             }
