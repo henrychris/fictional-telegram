@@ -4,45 +4,34 @@ using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using app.Components.Summary;
-using app.Entities;
-using app.Interfaces;
+using Contracts;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
+using app.Components.Summary;
+using app.Entities;
+using app.Interfaces;
 
 namespace app.Components.Reports
 {
     public class CompanyReports
     {
-        private readonly HttpClient _client;
-        private readonly ITelegramBotClient _botClient;
-        private readonly IEpumpDataRepository _epumpDataRepository;
-        private Stream _pdfReport;
         private const string DateTimeFormat = "MMMM dd, yyyy";
+        private readonly ITelegramBotClient _botClient;
+        private readonly HttpClient _client;
         private readonly string _endDate = DateTime.Today.ToString("MMMM dd, yyyy");
+        private readonly IEpumpDataRepository _epumpDataRepository;
+        private readonly ILoggerManager _logger;
+        private Stream _pdfReport;
         private EpumpData _userData;
-        public CompanyReports(ITelegramBotClient botClient, IEpumpDataRepository epumpDataRepository, IHttpClientFactory httpClientFactory)
+        public CompanyReports(ITelegramBotClient botClient, IEpumpDataRepository epumpDataRepository, IHttpClientFactory httpClientFactory
+        , ILoggerManager logger)
         {
+            _logger = logger;
             _epumpDataRepository = epumpDataRepository;
             _botClient = botClient;
             _client = httpClientFactory.CreateClient("EpumpReportApi");
-        }
-
-        private static string ConvertTextToDateTime(string dateTimeText)
-        {
-            // TODO adjust the time settings
-            // -7 might be more than a week
-            // Epump Date Format is "Jan 1st, 2021"
-            return dateTimeText switch
-            {
-                "Today" => DateTime.Today.ToString(DateTimeFormat),
-                "Yesterday" => DateTime.Today.AddDays(-1).ToString(DateTimeFormat),
-                "Week" => DateTime.Today.AddDays(-7).ToString(DateTimeFormat),
-                "Month" => DateTime.Today.AddMonths(-1).ToString(DateTimeFormat),
-                _ => DateTime.Today.AddDays(-3).ToString(DateTimeFormat),
-            };
         }
 
         public async Task<Message> SendCompanyBranchSalesReportAsync(CallbackQuery query, Message message)
@@ -51,6 +40,7 @@ namespace app.Components.Reports
             var uri = $"EpumpReport/Company/CompanyBranchSalesReport?companyId={_userData.CompanyId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
 
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
+            if (result == null) await ReturnErrorMessage(message);
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, $"Summary\nYou sold:\nPMS:{result.PmsAmount}\nAGO: {result.AgoAmount}\nDPK: {result.DpkAmount}\nTotal: {result.TotalAmount}");
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyBranchSalesReport.pdf"));
@@ -63,6 +53,7 @@ namespace app.Components.Reports
             var uri = $"EpumpReport/Company/CompanyCashflowReport?companyId={_userData.CompanyId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
             var content = await GetReportWithoutSummaryDataAsync(message, uri, _userData);
 
+            if (content == null) await ReturnErrorMessage(message);
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, "CompanyCashFlowReport.pdf"));
         }
 
@@ -72,6 +63,8 @@ namespace app.Components.Reports
 
             var uri = $"EpumpReport/Company/Management/ExpenseCategoriesReport?companyId={_userData.CompanyId}";
             var content = await GetReportWithoutSummaryDataAsync(message, uri, _userData);
+            if (content == null) await ReturnErrorMessage(message);
+
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, "CompanyExpenseCategoriesReport.pdf"));
         }
 
@@ -81,11 +74,28 @@ namespace app.Components.Reports
             var uri = $"EpumpReport/Company/Management/OutstandingPayments?companyId={_userData.CompanyId}";
 
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
+            if (result == null) await ReturnErrorMessage(message);
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 Outstanding Amount: {result.OutstandingAmount}");
 
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyOutstandingPaymentsReport.pdf"));
+        }
+
+        public async Task<Message> SendCompanyPosTransactionsReportAsync(CallbackQuery query, Message message)
+        {
+            _userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
+            string uri = $"EpumpReport/PosTransactionReport?companyId={_userData.CompanyId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
+
+            var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
+            if (result == null) await ReturnErrorMessage(message);
+
+            await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
+Amount of cashbacks : {result.CashbackAmount}
+Failed Transactions: {result.FailedAmount}
+Succesful Transactions: {result.SuccesfulAmount}
+");
+            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "Pos Transactions Report.pdf"));
         }
 
         public async Task<Message> SendCompanyRetainershipReportAsync(CallbackQuery query, Message message)
@@ -94,6 +104,8 @@ Outstanding Amount: {result.OutstandingAmount}");
             var uri = $"EpumpReport/Company/Retainerships/RetainershipReport?companyId={_userData.CompanyId}";
 
             var content = await GetReportWithoutSummaryDataAsync(message, uri, _userData);
+            if (content == null) await ReturnErrorMessage(message);
+
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, "CompanyRetainershipReport.pdf"));
         }
 
@@ -103,6 +115,7 @@ Outstanding Amount: {result.OutstandingAmount}");
 
             var uri = $"EpumpReport/Company/CompanySalesSummaryReport?companyId={_userData.CompanyId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
+            if (result == null) await ReturnErrorMessage(message);
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
@@ -123,6 +136,8 @@ Total Sales: {result.TotalAmount}
             var uri = $"​EpumpReport​/Company​/CompanyTankStockReport?companyId={_userData.CompanyId}";
 
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
+            if (result == null) await ReturnErrorMessage(message);
+
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
 PMS Volume: {result.PmsVolume}
@@ -145,6 +160,8 @@ DPK Volume: {result.LpgVolume}
 
             var uri = $"EpumpReport/Company/CompanyTanksFilledReport?companyId={_userData.CompanyId}&date={date}";
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
+            if (result == null) await ReturnErrorMessage(message);
+
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
 Volume Discharged(Epump): {result.EpumpDischarge}
@@ -154,18 +171,12 @@ Volume Discharged(Manual): {result.ManualDischarge}
             return await _botClient.SendDocumentAsync(message.Chat.Id, new InputOnlineFile(_pdfReport, "CompanyTanksFilledReport.pdf"));
         }
 
-        private static string ValidateDateInput(Message message)
-        {
-            return DateTime.TryParseExact(message.Text, DateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) 
-                ? date.ToString(DateTimeFormat) 
-                : "Invalid Date";
-        }
-
         public async Task<Message> SendCompanyVarianceReportAsync(CallbackQuery query, Message message)
         {
             _userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
             string uri = $"EpumpReport/Company/CompanyVarianceReport?companyId={_userData.CompanyId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
+            if (result == null) await ReturnErrorMessage(message);
 
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
@@ -180,31 +191,12 @@ Variance: {result.TotalVariance}");
             _userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
 
             var uri = $"​EpumpReport/Company/Retainerships/WalletFundRequestReport?companyId={_userData.CompanyId}&status={query.Data}";
-            try
-            {
-                var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
-                await _botClient.SendTextMessageAsync(query.Message.Chat.Id, $"Summary\nAmount Paid: {result.AmountPaid}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+            var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
+            if (result == null) await ReturnErrorMessage(message);
+
+            await _botClient.SendTextMessageAsync(query.Message.Chat.Id, $"Summary\nAmount Paid: {result.AmountPaid}");
 
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "WalletFundRequest.pdf"));
-        }
-
-        public async Task<Message> SendCompanyPosTransactionsReportAsync(CallbackQuery query, Message message)
-        {
-            _userData = await _epumpDataRepository.GetUserDetailsAsync(message.Chat.Id);
-            string uri = $"EpumpReport/PosTransactionReport?companyId={_userData.CompanyId}&startDate={ConvertTextToDateTime(query.Data)}&endDate={_endDate}";
-
-            var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
-            await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
-Amount of cashbacks : {result.CashbackAmount}
-Failed Transactions: {result.FailedAmount}
-Succesful Transactions: {result.SuccesfulAmount}
-");
-            return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(_pdfReport, "Pos Transactions Report.pdf"));
         }
 
         public async Task<Message> SendCompanyWalletReportAsync(CallbackQuery query, Message message)
@@ -213,6 +205,8 @@ Succesful Transactions: {result.SuccesfulAmount}
             var uri = $"EpumpReport/Company/Management/CompanyWalletReport?companyId={_userData.CompanyId}";
 
             var result = await GetReportWithSummaryDataAsync(message, uri, _userData);
+            if (result == null) await ReturnErrorMessage(message);
+
             await _botClient.SendTextMessageAsync(message.Chat.Id, $@"Summary
 
 Wallet Balance: {ParseAsCurrency(result.WalletBalance)}
@@ -228,7 +222,31 @@ Wallet BookBalance: {ParseAsCurrency(result.WalletBookBalance)}
 
             var uri = $"EpumpReport/Company/Management/ZonesReport?companyId={_userData.CompanyId}";
             var content = await GetReportWithoutSummaryDataAsync(message, uri, _userData);
+            if (content == null) await ReturnErrorMessage(message);
+
             return await _botClient.SendDocumentAsync(query.Message.Chat.Id, new InputOnlineFile(content, "CompanyZonesReport.pdf"));
+        }
+
+        private static string ConvertTextToDateTime(string dateTimeText)
+        {
+            // TODO adjust the time settings
+            // -7 might be more than a week
+            // Epump Date Format is "Jan 1st, 2021"
+            return dateTimeText switch
+            {
+                "Today" => DateTime.Today.ToString(DateTimeFormat),
+                "Yesterday" => DateTime.Today.AddDays(-1).ToString(DateTimeFormat),
+                "Week" => DateTime.Today.AddDays(-7).ToString(DateTimeFormat),
+                "Month" => DateTime.Today.AddMonths(-1).ToString(DateTimeFormat),
+                _ => DateTime.Today.AddDays(-3).ToString(DateTimeFormat),
+            };
+        }
+
+        private static string ValidateDateInput(Message message)
+        {
+            return DateTime.TryParseExact(message.Text, DateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)
+                ? date.ToString(DateTimeFormat)
+                : "Invalid Date";
         }
 
         private async Task<SummaryData> GetReportWithSummaryDataAsync(Message message, string uri, EpumpData userData)
@@ -241,6 +259,13 @@ Wallet BookBalance: {ParseAsCurrency(result.WalletBookBalance)}
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
             var response = await _client.SendAsync(requestMessage);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError($"Request failed with status code: {response.StatusCode}");
+                _logger.LogError($"Request: {requestMessage.ToString()}");
+                return null;
+            }
 
             var content = await response.Content.ReadAsStreamAsync();
             var result = await JsonSerializer.DeserializeAsync<SummaryData>(content);
@@ -260,7 +285,14 @@ Wallet BookBalance: {ParseAsCurrency(result.WalletBookBalance)}
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
             var response = await _client.SendAsync(requestMessage);
-            
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError($"Request failed with status code: {response.StatusCode}");
+                _logger.LogError($"Request: {requestMessage.ToString()}");
+                return null;
+            }
+
             var content = await response.Content.ReadAsStreamAsync();
             return content;
         }
@@ -269,6 +301,11 @@ Wallet BookBalance: {ParseAsCurrency(result.WalletBookBalance)}
         {
             var x = Convert.ToDouble(value);
             return x.ToString("C2", CultureInfo.CreateSpecificCulture(("HA-LATN-NG")));
+        }
+
+        private async Task<Message> ReturnErrorMessage(Message message)
+        {
+            return await _botClient.SendTextMessageAsync(message.Chat.Id, "An error occured. Please try again later.");
         }
     }
 }
