@@ -18,6 +18,7 @@ namespace app
             using var scope = host.Services.CreateScope();
             var services = scope.ServiceProvider;
             ServerStart = DateTime.Now;
+
             try
             {
                 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -26,13 +27,11 @@ namespace app
                 {
                     var context = services.GetRequiredService<DataContext>();
                     await context.Database.MigrateAsync();
-                    // await Seed.SeedDataBase(context);
                 }
                 else
                 {
                     var context = services.GetRequiredService<PostGresDataContext>();
                     await context.Database.MigrateAsync();
-                    // await Seed.SeedDataBase(context);
                 }
 
             }
