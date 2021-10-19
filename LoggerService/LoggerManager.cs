@@ -15,6 +15,7 @@ namespace LoggerService
         public void LogError(Exception ex, string message)
         {
             logger.Error(ex, message);
+            Console.WriteLine($"\n{ex.Message}");
         }
 
         public void LogError(string message)

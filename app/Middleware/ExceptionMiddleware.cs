@@ -32,6 +32,7 @@ namespace app.Middleware
             {
                 _logger.LogError(ex, $"Error in ExceptionMiddleware: {ex.Message}\n{ex.StackTrace}\n\n\nINNER EXCEPTION\n\n" +
                     $"{ex.InnerException}");
+                
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
