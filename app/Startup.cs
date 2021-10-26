@@ -64,24 +64,11 @@ namespace app
 
         public static void ConfigureDbContext(this IServiceCollection services, string dbConnectionString)
         {
-            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-            if (env == "Production")
-            {
                 services.AddDbContext<DataContext>(
                     options =>
                     {
                         options.UseSqlServer(dbConnectionString);
                     });
-            }
-            else
-            {
-                services.AddDbContext<PostGresDataContext>(
-                    options =>
-                    {
-                        options.UseNpgsql(dbConnectionString);
-                    });
-            }
         }
         public static void ConfigureLoggerService(this IServiceCollection services)
         {

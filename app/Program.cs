@@ -21,19 +21,8 @@ namespace app
 
             try
             {
-                var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-                if (env == "Production")
-                {
-                    var context = services.GetRequiredService<DataContext>();
-                    await context.Database.MigrateAsync();
-                }
-                else
-                {
-                    var context = services.GetRequiredService<PostGresDataContext>();
-                    await context.Database.MigrateAsync();
-                }
-
+                var context = services.GetRequiredService<DataContext>();
+                await context.Database.MigrateAsync();
             }
             catch (Exception ex)
             {
